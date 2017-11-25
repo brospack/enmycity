@@ -1,3 +1,6 @@
 <resources>
-  <string name="app_name">en-my-city</string>
+  <string name="app_name">EnMyCity</string>
+  <string name="facebook_app_id">2065891243632828</string>
+  <string name="fb_login_protocol_scheme">fb2065891243632828</string>
+  <string name="places_api_key">AIzaSyBsJN_5qtN_rIj1YoRMI71EO3wujxmJbBs</string>
 </resources>

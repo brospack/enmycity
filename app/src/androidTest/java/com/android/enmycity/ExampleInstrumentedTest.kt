@@ -1,4 +1,4 @@
-package com.android.en_my_city
+package com.android.enmycity
 
 import android.support.test.InstrumentationRegistry
 import android.support.test.runner.AndroidJUnit4
