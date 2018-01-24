@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <string name="interests_coffee_language">coffee language</string>
+  <string name="interests_night_life">night life</string>
+  <string name="interests_local_shopping">local shopping</string>
+  <string name="interests_gastronomic_tour">gastronomic tour</string>
+  <string name="interests_city_tour">city tour</string>
+  <string name="interests_sport_break">sport break</string>
+  <string name="interests_volunteering">volunteering</string>
+</resources>

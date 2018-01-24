@@ -1,5 +1,7 @@
 package com.android.enmycity.user
 
+import com.android.enmycity.user.model.GenderType
+
 data class FacebookUserModel(val id: Long,
                              val name: String,
                              val lastName: String,
