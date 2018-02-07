@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <string name="userLogin_allow_location_message">To be able to ensure a complete experience, it is necessary to activate the location</string>
+  <string name="userLogin_permission_denied_advice_messa">Si no acepta este permiso no podrá utilizar la aplicación</string>
+  <string name="userlogin_accept_permission_button">Permissions</string>
+  <string name="userlogin_open_settings_button">Open</string>
+  <string name="userlogin_open_settings_message">Es necesario activar la localización</string>
+</resources>

@@ -3,6 +3,8 @@ package com.android.enmycity.user
 import android.content.Context
 import android.content.SharedPreferences
 import android.preference.PreferenceManager
+import com.android.enmycity.doubleToLongBits
+import com.android.enmycity.longBitsToDouble
 
 class UserRepository(context: Context) {
   companion object {
@@ -15,6 +17,8 @@ class UserRepository(context: Context) {
     private val USER_GENDER = "PREFERENCES_USER_GENDER"
     private val USER_IS_LOCAL = "PREFERENCES_USER_IS_LOCAL"
     private val USER_IS_CREATED = "PREFERENCES_USER_IS_CREATED"
+    private val USER_LATITUDE = "PREFERENCES_USER_LATITUDE"
+    private val USER_LONGITUDE = "PREFERENCES_USER_LONGITUDE"
   }
 
   private val sharedPreferences: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
@@ -48,6 +52,14 @@ class UserRepository(context: Context) {
 
   fun saveUserGender(gender: String) = saveStringValue(USER_GENDER, gender)
 
+  fun saveLatitude(latitude: Double) = saveDoubleValue(USER_LATITUDE, latitude)
+
+  fun getLatitude() = sharedPreferences.getLong(USER_LATITUDE, 0L).longBitsToDouble()
+
+  fun saveLongitude(longitude: Double) = saveDoubleValue(USER_LONGITUDE, longitude)
+
+  fun getLongitude() = sharedPreferences.getLong(USER_LONGITUDE, 0L).longBitsToDouble()
+
   fun setIsUserCreated(isFinished: Boolean) = with(editor) {
     putBoolean(USER_IS_CREATED, isFinished)
     apply()
@@ -77,6 +89,11 @@ class UserRepository(context: Context) {
 
   private fun saveStringValue(preferenceName: String, value: String) = with(editor) {
     putString(preferenceName, value)
+    apply()
+  }
+
+  private fun saveDoubleValue(preferenceName: String, value: Double) = with(editor) {
+    putLong(preferenceName, value.doubleToLongBits())
     apply()
   }
 }

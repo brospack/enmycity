@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <string name="userLogin_allow_location_message">To be able to ensure a complete experience, it is necessary to activate the location</string>
+</resources>
