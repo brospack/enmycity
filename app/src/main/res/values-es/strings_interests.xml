@@ -7,4 +7,5 @@
   <string name="interests_city_tour">paseo por la ciudad</string>
   <string name="interests_sport_break">sport break</string>
   <string name="interests_volunteering">voluntariado</string>
+  <string name="interests_warning_selected">Debes seleccionar al menos un interés</string>
 </resources>

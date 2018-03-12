@@ -5,10 +5,13 @@ import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.widget.Switch
 import com.android.enmycity.R
-import com.android.enmycity.search.SearchActivity
-import com.android.enmycity.user.UserRepository
+import com.android.enmycity.data.UserDao
+import com.android.enmycity.data.UserSharedPreferences
+import com.android.enmycity.openSearchActivity
+import com.android.enmycity.user.AccountCreationPreferences
 import com.bumptech.glide.Glide
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.GeoPoint
 import kotlinx.android.synthetic.main.activity_interests.interests_cityTour_switch
 import kotlinx.android.synthetic.main.activity_interests.interests_coffeeLanguage_switch
 import kotlinx.android.synthetic.main.activity_interests.interests_gastronomicTour_switch
@@ -20,34 +23,24 @@ import kotlinx.android.synthetic.main.activity_interests.interests_user_image
 import kotlinx.android.synthetic.main.activity_interests.interests_view
 import kotlinx.android.synthetic.main.activity_interests.interests_volunteering_switch
 import org.jetbrains.anko.childrenSequence
-import org.jetbrains.anko.startActivity
 import org.jetbrains.anko.toast
-import java.util.Date
 
 class InterestsActivity : AppCompatActivity() {
-  private val userRepository by lazy { UserRepository(this) }
+  private val accountCreationPreferences by lazy { AccountCreationPreferences(this) }
+  private val userPreferences by lazy { UserSharedPreferences(this) }
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     setContentView(R.layout.activity_interests)
-    userRepository.let {
+    accountCreationPreferences.let {
       showUserAvatar(it.getUserAvatar())
     }
     interests_next_floatingActionButton.setOnClickListener {
       when (thereAreAnyInterestChecked()) {
         true -> createFirebaseUser()
-        false -> toast("ANDE VAS CABESTRO")
+        false -> toast(R.string.interests_warning_selected)
       }
     }
-
-//    FirebaseAuth.getInstance().currentUser.let {
-//      val email = it?.email ?: ""
-//      val docRefer = firestore.collection("users").document(email)
-//      docRefer.get().addOnCompleteListener {
-//        if (it.isSuccessful) {
-//        }
-//      }
-//    }
   }
 
   private fun showUserAvatar(url: String) = Glide.with(this).load(url).into(interests_user_image)
@@ -60,45 +53,38 @@ class InterestsActivity : AppCompatActivity() {
       .toList().size
 
   private fun createFirebaseUser() {
-    val db = FirebaseFirestore.getInstance()
-    val user = HashMap<String, Any>()
-    val interests = HashMap<String, Any>()
+    with(accountCreationPreferences) {
+      val user = UserDao(
+          name = getUserName(),
+          email = getUserEmail(),
+          photoUrl = getUserAvatar(),
+          gender = getUserGender(),
+          birthday = getUserBirthday(),
+          city = getUserCity(),
+          statusId = 1,
+          location = GeoPoint(getLatitude(), getLongitude()),
+          coffeeLanguage = interests_coffeeLanguage_switch.isChecked,
+          nightLife = interests_nightLife_switch.isChecked,
+          localShopping = interests_localShopping_switch.isChecked,
+          gastronomicTour = interests_gastronomicTour_switch.isChecked,
+          cityTour = interests_cityTour_switch.isChecked,
+          sportBreak = interests_sportBreak_switch.isChecked,
+          volunteering = interests_volunteering_switch.isChecked)
 
-    interests.apply {
-      put("coffeeLanguage", interests_coffeeLanguage_switch.isChecked)
-      put("nightLife", interests_nightLife_switch.isChecked)
-      put("localShopping", interests_localShopping_switch.isChecked)
-      put("gastronomicTour", interests_gastronomicTour_switch.isChecked)
-      put("cityTour", interests_cityTour_switch.isChecked)
-      put("sportBreak", interests_sportBreak_switch.isChecked)
-      put("volunteering", interests_volunteering_switch.isChecked)
-    }
-
-    with(userRepository) {
-      val userType = getUserType()
-      user.apply {
-        put("name", getUserName())
-        put("email", getUserEmail())
-        put("photoUrl", getUserAvatar())
-        put("genderTypeId", getUserGender())
-        put("birthday", getUserBirthday())
-        put("city", getUserCity())
-        put("alterDate", Date())
-        put("creationDate", Date())
-        put("statusId", 1)
-        put("interests", interests)
-      }
-
-      db.collection(userType).document(getUserEmail())
+      FirebaseFirestore.getInstance()
+          .collection(getUserType())
+          .document(getUserEmail())
           .set(user)
-          .addOnSuccessListener { goToSearchActivity() }
-          .addOnFailureListener { Log.i("SAVE", "FAIL") }
+          .addOnSuccessListener { saveUserInPreferences(user); openSearchActivity() }
+          .addOnFailureListener { Log.i("Fail saving", it.message) }
     }
   }
 
-  private fun goToSearchActivity() {
-    userRepository.setIsUserCreated(true)
-    startActivity<SearchActivity>()
-    finish()
+  private fun saveUserInPreferences(user: UserDao) {
+    when (accountCreationPreferences.getUserType() == "locals") {
+      true -> userPreferences.saveUserLocal(user)
+      false -> userPreferences.saveUserTraveller(user)
+    }
+    accountCreationPreferences.clear()
   }
 }

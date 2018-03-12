@@ -6,19 +6,19 @@ import android.preference.PreferenceManager
 import com.android.enmycity.doubleToLongBits
 import com.android.enmycity.longBitsToDouble
 
-class UserRepository(context: Context) {
+class AccountCreationPreferences(context: Context) {
   companion object {
-    private val USER_ID = "PREFERENCES_USER_ID"
-    private val USER_NAME = "PREFERENCES_USER_NAME"
-    private val USER_EMAIL = "PREFERENCES_USER_EMAIL"
-    private val USER_AVATAR = "PREFERENCES_USER_AVATAR"
-    private val USER_BIRTHDAY = "PREFERENCES_USER_BIRTHDAY"
-    private val USER_CITY = "PREFERENCES_USER_CITY"
-    private val USER_GENDER = "PREFERENCES_USER_GENDER"
-    private val USER_IS_LOCAL = "PREFERENCES_USER_IS_LOCAL"
-    private val USER_IS_CREATED = "PREFERENCES_USER_IS_CREATED"
-    private val USER_LATITUDE = "PREFERENCES_USER_LATITUDE"
-    private val USER_LONGITUDE = "PREFERENCES_USER_LONGITUDE"
+    private const val USER_ID = "ACCOUNT_CREATION_PREFERENCES_USER_ID"
+    private const val USER_NAME = "ACCOUNT_CREATION_PREFERENCES_NAME"
+    private const val USER_EMAIL = "ACCOUNT_CREATION_PREFERENCES_EMAIL"
+    private const val USER_AVATAR = "ACCOUNT_CREATION_PREFERENCES_AVATAR"
+    private const val USER_BIRTHDAY = "ACCOUNT_CREATION_PREFERENCES_BIRTHDAY"
+    private const val USER_CITY = "ACCOUNT_CREATION_PREFERENCES_USER_CITY"
+    private const val USER_GENDER = "ACCOUNT_CREATION_PREFERENCES_GENDER"
+    private const val USER_IS_LOCAL = "ACCOUNT_CREATION_PREFERENCES_IS_LOCAL"
+    private const val USER_LATITUDE = "ACCOUNT_CREATION_PREFERENCES_LATITUDE"
+    private const val USER_LONGITUDE = "ACCOUNT_CREATION_PREFERENCES_LONGITUDE"
+
   }
 
   private val sharedPreferences: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
@@ -60,17 +60,10 @@ class UserRepository(context: Context) {
 
   fun getLongitude() = sharedPreferences.getLong(USER_LONGITUDE, 0L).longBitsToDouble()
 
-  fun setIsUserCreated(isFinished: Boolean) = with(editor) {
-    putBoolean(USER_IS_CREATED, isFinished)
-    apply()
-  }
-
-  fun isUserCreated() = sharedPreferences.getBoolean(USER_IS_CREATED, false)
-
   fun getUserGender() =
       sharedPreferences.getString(USER_GENDER, "").let {
         when (it.toLowerCase() == "male") {
-          true -> 0
+          true -> 2
           false -> 1
         }
       }
@@ -85,6 +78,10 @@ class UserRepository(context: Context) {
       true -> "locals"
       false -> "travellers"
     }
+  }
+
+  fun clear() {
+    editor.clear()
   }
 
   private fun saveStringValue(preferenceName: String, value: String) = with(editor) {

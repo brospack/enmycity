@@ -7,4 +7,5 @@
   <string name="interests_city_tour">city tour</string>
   <string name="interests_sport_break">sport break</string>
   <string name="interests_volunteering">volunteering</string>
+  <string name="interests_warning_selected">You must select at least one interest</string>
 </resources>
