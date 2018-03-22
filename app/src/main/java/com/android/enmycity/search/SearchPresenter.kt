@@ -1,5 +1,6 @@
 package com.android.enmycity.search
 
+import android.location.Geocoder
 import com.android.enmycity.data.UserDao
 import com.android.enmycity.data.UserSharedPreferences
 import com.google.firebase.firestore.DocumentSnapshot
@@ -63,6 +64,7 @@ class SearchPresenter(private val userSharedPreferences: UserSharedPreferences,
         .addOnCompleteListener {
           if (it.isSuccessful) {
             showElementsInView(it.result.documents)
+            getLocation()
           }
         }
   }
@@ -80,5 +82,9 @@ class SearchPresenter(private val userSharedPreferences: UserSharedPreferences,
         interests
       }
 
-
+  private fun getLocation() {
+    val latitude = userSharedPreferences.getCurrentUser().location.latitude
+    val longitude = userSharedPreferences.getCurrentUser().location.longitude
+    view.showLocation(latitude, longitude)
+  }
 }

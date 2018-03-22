@@ -7,16 +7,8 @@
 
   <FrameLayout
       android:layout_width="match_parent"
-      android:layout_height="wrap_content"
-      android:id="@+id/myFragment"
-      android:visibility="gone"
-      />
-  <android.support.v7.widget.RecyclerView
-      android:id="@+id/search_results_recyclerView"
-      android:layout_width="match_parent"
       android:layout_height="match_parent"
-      android:background="@color/colorPrimaryDark"
-      android:visibility="gone"
+      android:id="@+id/myFragment"
       />
   <android.support.design.widget.BottomNavigationView
       android:id="@+id/search_results_bottomNavigationView"
@@ -34,6 +26,6 @@
       android:layout_height="wrap_content"
       android:id="@+id/search_progressBar"
       android:scrollbars="vertical"
-      android:visibility="visible"
+      android:visibility="gone"
       />
 </RelativeLayout>

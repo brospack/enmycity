@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <string name="bottomNavigationMenu_search">Search</string>
+  <string name="bottomNavigationMenu_profile">Profile</string>
+  <string name="bottomNavigationMenu_matches">Matches</string>
+  <string name="bottomNavigationMenu_messages">Messages</string>
+</resources>

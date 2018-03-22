@@ -29,7 +29,6 @@ import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.android.synthetic.main.activity_login.login_facebook_button
 import kotlinx.android.synthetic.main.activity_login.login_progress_bar
 import org.jetbrains.anko.alert
-import org.jetbrains.anko.toast
 
 class UserLoginActivity : AppCompatActivity() {
   private val callbackManager = CallbackManager.Factory.create()

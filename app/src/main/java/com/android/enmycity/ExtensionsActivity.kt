@@ -3,6 +3,7 @@ package com.android.enmycity
 import android.app.Activity
 
 import com.android.enmycity.interests.InterestsActivity
+import com.android.enmycity.main.UserMainActivity
 import com.android.enmycity.search.SearchActivity
 import com.android.enmycity.user.SelectTypeUserActivity
 import org.jetbrains.anko.startActivity
@@ -32,4 +33,8 @@ fun Activity.openLoadUserTypeActivity() {
   this.finish()
 }
 
+fun Activity.openUserMainActivity() {
+  startActivity<UserMainActivity>()
+  this.finish()
+}
 

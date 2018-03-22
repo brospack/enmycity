@@ -18,6 +18,7 @@ import com.android.enmycity.data.UserSharedPreferences
 import com.android.enmycity.openLoginActivity
 import com.android.enmycity.openSearchActivity
 import com.android.enmycity.openSelectUserTypeActivity
+import com.android.enmycity.openUserMainActivity
 import com.google.firebase.auth.FirebaseAuth
 import com.karumi.dexter.Dexter
 import com.karumi.dexter.PermissionToken
@@ -116,7 +117,7 @@ class MainActivity : AppCompatActivity() {
 
   private fun isUserLogged() = FirebaseAuth.getInstance().currentUser != null
 
-  private fun getUserData() = if (userSharedPreferences.isUserLoaded()) openSearchActivity() else openSelectUserTypeActivity()
+  private fun getUserData() = if (userSharedPreferences.isUserLoaded()) openUserMainActivity() else openSelectUserTypeActivity()
 
   private fun observableTest() {
     val word = "Thread"
