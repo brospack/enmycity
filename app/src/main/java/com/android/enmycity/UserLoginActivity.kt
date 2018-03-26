@@ -36,6 +36,8 @@ class UserLoginActivity : AppCompatActivity() {
   private val accountCreationPreferences: AccountCreationPreferences by lazy { AccountCreationPreferences(this) }
   private val userSharedPreferences: UserSharedPreferences by lazy { UserSharedPreferences(this) }
   private val locationManager: LocationManager by lazy { this.getSystemService(Context.LOCATION_SERVICE) as LocationManager }
+  private val presenter: LoginPresenter by lazy { LoginPresenter(FirebaseAuth.getInstance(), AccountCreationPreferences(this),
+      UserSharedPreferences(this)) }
 
   companion object {
     private const val REQUEST_CODE_SETTINGS = 1

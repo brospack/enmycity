@@ -4,12 +4,14 @@ import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
+import android.view.View.GONE
 import android.view.ViewGroup
 import com.android.enmycity.R
 import com.android.enmycity.data.UserDao
 import com.android.enmycity.data.UserSharedPreferences
 import com.bumptech.glide.Glide
 import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.android.synthetic.main.fragment_user_profile.user_ProgressBar
 import kotlinx.android.synthetic.main.fragment_user_profile.user_avatar_imageView
 import kotlinx.android.synthetic.main.fragment_user_profile.user_cityTour_switch
 import kotlinx.android.synthetic.main.fragment_user_profile.user_coffeeLanguage_switch
@@ -79,6 +81,7 @@ class UserFragment : Fragment(), UserView {
       user_sportBreak_switch.isChecked = sportBreak
       user_volunteering_switch.isChecked = volunteering
     }
+    user_ProgressBar.visibility = GONE
   }
 
   private fun showImage(url: String) {

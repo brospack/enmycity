@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import com.android.enmycity.R
 import com.android.enmycity.data.UserDao
 import com.bumptech.glide.Glide
@@ -33,6 +34,7 @@ class ProfilesAdapter(private val elements: List<UserDao>, private val context: 
     fun bind(profileViewModel: UserDao) {
       nameTextView.text = profileViewModel.name
       Glide.with(context).load(profileViewModel.photoUrl).into(avatarImageView)
+      itemView.setOnClickListener {Toast.makeText(context,"hola",Toast.LENGTH_SHORT).show() }
     }
   }
 }

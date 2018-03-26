@@ -4,6 +4,7 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
+import android.location.Location
 import android.location.LocationManager
 import android.net.Uri
 import android.os.Bundle
@@ -14,11 +15,13 @@ import android.util.Log
 import android.view.View
 import com.android.enmycity.BuildConfig
 import com.android.enmycity.R
+import com.android.enmycity.data.AccountPreferencesDao
 import com.android.enmycity.data.UserSharedPreferences
 import com.android.enmycity.openLoginActivity
 import com.android.enmycity.openSearchActivity
 import com.android.enmycity.openSelectUserTypeActivity
 import com.android.enmycity.openUserMainActivity
+import com.android.enmycity.user.AccountCreationPreferences
 import com.google.firebase.auth.FirebaseAuth
 import com.karumi.dexter.Dexter
 import com.karumi.dexter.PermissionToken
@@ -35,6 +38,7 @@ import org.jetbrains.anko.alert
 class MainActivity : AppCompatActivity() {
   private val userSharedPreferences: UserSharedPreferences by lazy { UserSharedPreferences(this) }
   private val locationManager: LocationManager by lazy { this.getSystemService(Context.LOCATION_SERVICE) as LocationManager }
+  private val accountCreationPreferences: AccountCreationPreferences by lazy { AccountCreationPreferences(this) }
 
   companion object {
     private const val REQUEST_CODE_SETTINGS = 1
@@ -78,11 +82,19 @@ class MainActivity : AppCompatActivity() {
     if (location != null) {
       when (isUserLogged()) {
         true -> getUserData()
-        false -> openLoginActivity()
+        false -> proceedToLogin(location)
       }
     } else {
       showsLocationsDialog()
     }
+  }
+
+  private fun proceedToLogin(location: Location) {
+    with(location) {
+      accountCreationPreferences.saveLatitude(latitude)
+      accountCreationPreferences.saveLongitude(longitude)
+    }
+    openLoginActivity()
   }
 
   private fun showsLocationsDialog() {

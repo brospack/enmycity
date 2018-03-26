@@ -1,5 +1,6 @@
 package com.android.enmycity.interests
 
+import android.location.Geocoder
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
@@ -7,7 +8,7 @@ import android.widget.Switch
 import com.android.enmycity.R
 import com.android.enmycity.data.UserDao
 import com.android.enmycity.data.UserSharedPreferences
-import com.android.enmycity.openSearchActivity
+import com.android.enmycity.openUserMainActivity
 import com.android.enmycity.user.AccountCreationPreferences
 import com.bumptech.glide.Glide
 import com.google.firebase.firestore.FirebaseFirestore
@@ -53,6 +54,11 @@ class InterestsActivity : AppCompatActivity() {
       .toList().size
 
   private fun createFirebaseUser() {
+
+    val geocoder = Geocoder(this)
+    val addresses = geocoder.getFromLocation(accountCreationPreferences.getLatitude(), accountCreationPreferences.getLongitude(), 1)
+    val zipCode = addresses.first()?.let { it.postalCode ?: "0" } ?: "0"
+
     with(accountCreationPreferences) {
       val user = UserDao(
           name = getUserName(),
@@ -62,6 +68,7 @@ class InterestsActivity : AppCompatActivity() {
           birthday = getUserBirthday(),
           city = getUserCity(),
           statusId = 1,
+          zipCode = zipCode.toInt(),
           location = GeoPoint(getLatitude(), getLongitude()),
           coffeeLanguage = interests_coffeeLanguage_switch.isChecked,
           nightLife = interests_nightLife_switch.isChecked,
@@ -75,7 +82,7 @@ class InterestsActivity : AppCompatActivity() {
           .collection(getUserType())
           .document(getUserEmail())
           .set(user)
-          .addOnSuccessListener { saveUserInPreferences(user); openSearchActivity() }
+          .addOnSuccessListener { saveUserInPreferences(user); openUserMainActivity() }
           .addOnFailureListener { Log.i("Fail saving", it.message) }
     }
   }

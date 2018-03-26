@@ -7,11 +7,13 @@ import android.support.design.widget.BottomNavigationView
 import android.support.v4.app.Fragment
 import android.support.v7.app.AppCompatActivity
 import android.view.MenuItem
+import android.view.View.VISIBLE
 import com.android.enmycity.R
 import com.android.enmycity.search.SearchFragment
 import com.android.enmycity.user.UserFragment
 import com.google.android.gms.location.places.ui.PlacePicker
 import kotlinx.android.synthetic.main.activity_user_main.search_results_bottomNavigationView
+import kotlinx.android.synthetic.main.fragment_search.search_places_floatingActionButton
 import org.jetbrains.anko.longToast
 
 class UserMainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemSelectedListener {
@@ -38,15 +40,16 @@ class UserMainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationI
     replaceFragment(SearchFragment())
   }
 
-  override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-    if (resultCode == Activity.RESULT_OK) {
-      if (requestCode == 999) {
-        val place = PlacePicker.getPlace(this, data)
-        val placeName = place.name.toString()
-        val latitude = place.latLng.latitude.toString()
-        val longitude = place.latLng.longitude.toString()
-        longToast("Place: $placeName - $latitude; $longitude")
-      }
-    }
-  }
+//  override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+//    search_places_floatingActionButton.visibility = VISIBLE
+//    if (resultCode == Activity.RESULT_OK) {
+//      if (requestCode == RESULT_CODE_PLACE_AUTOCOMPLETE) {
+//        val place = PlacePicker.getPlace(this, data)
+//        val placeName = place.name.toString()
+//        val latitude = place.latLng.latitude.toString()
+//        val longitude = place.latLng.longitude.toString()
+//        longToast("Place: $placeName - $latitude; $longitude")
+//      }
+//    }
+//  }
 }
