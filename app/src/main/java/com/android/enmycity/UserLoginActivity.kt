@@ -9,9 +9,8 @@ import android.os.Bundle
 import android.provider.Settings
 import android.support.design.widget.Snackbar
 import android.view.View
+import android.view.View.GONE
 import android.view.View.VISIBLE
-import com.android.enmycity.data.AccountPreferencesDao
-import com.android.enmycity.data.UserDao
 import com.android.enmycity.data.UserSharedPreferences
 import com.android.enmycity.user.AccountCreationPreferences
 import com.facebook.AccessToken
@@ -22,22 +21,18 @@ import com.facebook.FacebookSdk
 import com.facebook.GraphRequest
 import com.facebook.appevents.AppEventsLogger
 import com.facebook.login.LoginResult
-import com.google.firebase.auth.FacebookAuthProvider
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.DocumentSnapshot
-import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.android.synthetic.main.activity_login.login_facebook_button
 import kotlinx.android.synthetic.main.activity_login.login_progress_bar
 import org.jetbrains.anko.alert
 
-class UserLoginActivity : AppCompatActivity() {
+class UserLoginActivity : AppCompatActivity(), LoginView {
   private val callbackManager = CallbackManager.Factory.create()
-  private val firabaseAuthentication: FirebaseAuth by lazy { FirebaseAuth.getInstance() }
-  private val accountCreationPreferences: AccountCreationPreferences by lazy { AccountCreationPreferences(this) }
-  private val userSharedPreferences: UserSharedPreferences by lazy { UserSharedPreferences(this) }
   private val locationManager: LocationManager by lazy { this.getSystemService(Context.LOCATION_SERVICE) as LocationManager }
-  private val presenter: LoginPresenter by lazy { LoginPresenter(FirebaseAuth.getInstance(), AccountCreationPreferences(this),
-      UserSharedPreferences(this)) }
+  private val presenter: LoginPresenter by lazy {
+    LoginPresenter(FirebaseAuth.getInstance(), AccountCreationPreferences(this),
+        UserSharedPreferences(this))
+  }
 
   companion object {
     private const val REQUEST_CODE_SETTINGS = 1
@@ -49,24 +44,18 @@ class UserLoginActivity : AppCompatActivity() {
     AppEventsLogger.activateApp(this)
     super.onCreate(savedInstanceState)
     setContentView(R.layout.activity_login)
-    obtainLocation()
+    presenter.setView(this)
+    presenter.onViewReady()
   }
 
   @SuppressLint("MissingPermission")
-  private fun obtainLocation() {
+  override fun getLocation() {
     val location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER)
     if (location != null) {
       initFacebookButton()
-      saveLocationInPreferences(location.latitude, location.longitude)
+      presenter.saveLocationInPreferences(location.latitude, location.longitude)
     } else {
       showsLocationsDialog()
-    }
-  }
-
-  private fun saveLocationInPreferences(latitude: Double, longitude: Double) {
-    accountCreationPreferences.apply {
-      saveLatitude(latitude)
-      saveLongitude(longitude)
     }
   }
 
@@ -95,7 +84,7 @@ class UserLoginActivity : AppCompatActivity() {
   override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
     super.onActivityResult(requestCode, resultCode, data)
     if (requestCode == REQUEST_CODE_SETTINGS) {
-      obtainLocation()
+      presenter.onViewReady()
     }
     callbackManager.onActivityResult(requestCode, resultCode, data)
   }
@@ -103,10 +92,12 @@ class UserLoginActivity : AppCompatActivity() {
   private fun initFacebookButton() {
     login_facebook_button.visibility = VISIBLE
     login_facebook_button.setReadPermissions(PERMISSIONS)
+
     val facebookCallback = object : FacebookCallback<LoginResult> {
       override fun onSuccess(loginResult: LoginResult) {
         login_progress_bar.visibility = VISIBLE
-        loginFacebookUser()
+        login_facebook_button.visibility = GONE
+        presenter.loginFacebookUser(AccessToken.getCurrentAccessToken())
       }
 
       override fun onCancel() {
@@ -118,30 +109,10 @@ class UserLoginActivity : AppCompatActivity() {
     login_facebook_button.registerCallback(callbackManager, facebookCallback)
   }
 
-  private fun loginFacebookUser() {
-    val accessToken = AccessToken.getCurrentAccessToken()
-    val facebookCredential = FacebookAuthProvider.getCredential(accessToken.token)
-    firabaseAuthentication.signInWithCredential(facebookCredential)
-        .addOnCompleteListener {
-          if (it.isSuccessful) {
-            createUser(accessToken)
-          }
-        }
-  }
-
-  private fun createUser(accessToken: AccessToken) {
+  override fun createUser(accessToken: AccessToken) {
     val graphJsonCallback = GraphRequest.GraphJSONObjectCallback { jsonObject, _ ->
       run {
-        with(accountCreationPreferences) {
-          saveUserId(jsonObject.getString("id"))
-          saveUserName(jsonObject.getString("name"))
-          saveUserEmail(jsonObject.getString("email"))
-          saveUserGender(jsonObject.getString("gender"))
-          saveUserBirthday(jsonObject.getString("birthday"))
-          saveUserCity(jsonObject.getJSONObject("location").getString("name"))
-          saveUserAvatar("http://graph.facebook.com/${jsonObject.getString("id")}/picture?type=large")
-        }
-        checkIfUserExists()
+        presenter.saveUserDataInPreferences(jsonObject)
       }
     }
     GraphRequest.newMeRequest(accessToken, graphJsonCallback).apply {
@@ -150,55 +121,15 @@ class UserLoginActivity : AppCompatActivity() {
     }
   }
 
-  private fun checkIfUserExists() {
-    FirebaseFirestore.getInstance()
-        .collection("accountPreferences")
-        .document(accountCreationPreferences.getUserEmail())
-        .get()
-        .addOnSuccessListener {
-          when (it.exists()) {
-            true -> obtainUserData(it)
-            false -> openSelectUserTypeActivity()
-          }
-        }
+  override fun goToLoadUserTypeActivity() {
+    openLoadUserTypeActivity()
   }
 
-  private fun obtainUserData(documentSnapshot: DocumentSnapshot) {
-    val accountPreferences = documentSnapshot.toObject(AccountPreferencesDao::class.java)
-    if (accountPreferences.isLocal && accountPreferences.isTraveller) {
-      openLoadUserTypeActivity()
-    } else if (accountPreferences.isTraveller) {
-      getTravellerAccount()
-    } else {
-      getLocalAccount()
-    }
+  override fun goToSelectUserTypeActivity() {
+    openSelectUserTypeActivity()
   }
 
-  private fun getLocalAccount() {
-    getAccount("locals")
-  }
-
-  private fun getTravellerAccount() {
-    getAccount("travellers")
-  }
-
-  private fun getAccount(typeUser: String) {
-    FirebaseFirestore.getInstance()
-        .collection(typeUser)
-        .document(accountCreationPreferences.getUserEmail())
-        .get()
-        .addOnSuccessListener {
-          if (it.exists()) {
-            loadUserInPreferences(it.toObject(UserDao::class.java), typeUser)
-            openSearchActivity()
-          } else openSelectUserTypeActivity()
-        }
-  }
-
-  private fun loadUserInPreferences(userDao: UserDao, typeUser: String) {
-    when (typeUser) {
-      "locals" -> userSharedPreferences.saveUserLocal(userDao)
-      "travellers" -> userSharedPreferences.saveUserTraveller(userDao)
-    }
+  override fun goToMainActivity() {
+    openUserMainActivity()
   }
 }
