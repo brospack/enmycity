@@ -2,6 +2,7 @@ package com.android.enmycity.search
 
 import android.app.Activity.RESULT_OK
 import android.content.Intent
+import android.location.Geocoder
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v7.widget.GridLayoutManager
@@ -44,8 +45,10 @@ class SearchFragment : Fragment(), SearchView {
   private fun startPlaceAutocomplete() {
     showProgressBar()
     try {
-      val autocompleteFilters = AutocompleteFilter.Builder().setTypeFilter(
-          AutocompleteFilter.TYPE_FILTER_CITIES)
+      val autocompleteFilters = AutocompleteFilter
+          .Builder()
+          .setTypeFilter(
+              AutocompleteFilter.TYPE_FILTER_CITIES)
           .build()
       val intent = PlaceAutocomplete.IntentBuilder(PlaceAutocomplete.MODE_OVERLAY)
           .setFilter(autocompleteFilters)
@@ -80,7 +83,6 @@ class SearchFragment : Fragment(), SearchView {
   }
 
   override fun showLocation(latitude: Double, longitude: Double) {
-
   }
 
   override fun showProgressBar() {

@@ -54,10 +54,7 @@ class InterestsActivity : AppCompatActivity() {
       .toList().size
 
   private fun createFirebaseUser() {
-
-    val geocoder = Geocoder(this)
-    val addresses = geocoder.getFromLocation(accountCreationPreferences.getLatitude(), accountCreationPreferences.getLongitude(), 1)
-    val zipCode = addresses.first()?.let { it.postalCode ?: "0" } ?: "0"
+    val addresses = Geocoder(this).getFromLocation(accountCreationPreferences.getLatitude(), accountCreationPreferences.getLongitude(), 1)
 
     with(accountCreationPreferences) {
       val user = UserDao(
@@ -66,17 +63,19 @@ class InterestsActivity : AppCompatActivity() {
           photoUrl = getUserAvatar(),
           gender = getUserGender(),
           birthday = getUserBirthday(),
-          city = getUserCity(),
           statusId = 1,
-          zipCode = zipCode.toInt(),
-          location = GeoPoint(getLatitude(), getLongitude()),
           coffeeLanguage = interests_coffeeLanguage_switch.isChecked,
           nightLife = interests_nightLife_switch.isChecked,
           localShopping = interests_localShopping_switch.isChecked,
           gastronomicTour = interests_gastronomicTour_switch.isChecked,
           cityTour = interests_cityTour_switch.isChecked,
           sportBreak = interests_sportBreak_switch.isChecked,
-          volunteering = interests_volunteering_switch.isChecked)
+          volunteering = interests_volunteering_switch.isChecked,
+          postalCode = addresses.first()?.postalCode?.toInt() ?: 0,
+          location = GeoPoint(getLatitude(), getLongitude()),
+          city = getUserCity(),
+          adminArea = addresses.first()?.adminArea ?: "",
+          subAdminArea = addresses.first()?.subAdminArea ?: "")
 
       FirebaseFirestore.getInstance()
           .collection(getUserType())

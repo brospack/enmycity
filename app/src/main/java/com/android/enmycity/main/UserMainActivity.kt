@@ -9,6 +9,8 @@ import android.support.v7.app.AppCompatActivity
 import android.view.MenuItem
 import android.view.View.VISIBLE
 import com.android.enmycity.R
+import com.android.enmycity.matches.MatchesFragment
+import com.android.enmycity.messages.MessagesFragment
 import com.android.enmycity.search.SearchFragment
 import com.android.enmycity.user.UserFragment
 import com.google.android.gms.location.places.ui.PlacePicker
@@ -21,6 +23,8 @@ class UserMainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationI
     return when (item.itemId) {
       R.id.bottomNavigationMenu_search -> replaceFragment(SearchFragment())
       R.id.bottomNavigationMenu_user -> replaceFragment(UserFragment())
+      R.id.bottomNavigationMenu_matches -> replaceFragment(MatchesFragment())
+      R.id.bottomNavigationMenu_messages -> replaceFragment(MessagesFragment())
       else -> true
     }
   }

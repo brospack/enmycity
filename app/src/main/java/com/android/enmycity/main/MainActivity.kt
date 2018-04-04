@@ -9,16 +9,17 @@ import android.location.LocationManager
 import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
+import android.support.constraint.ConstraintSet
 import android.support.design.widget.Snackbar
+import android.support.transition.AutoTransition
+import android.support.transition.TransitionManager
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.view.View
 import com.android.enmycity.BuildConfig
 import com.android.enmycity.R
-import com.android.enmycity.data.AccountPreferencesDao
 import com.android.enmycity.data.UserSharedPreferences
 import com.android.enmycity.openLoginActivity
-import com.android.enmycity.openSearchActivity
 import com.android.enmycity.openSelectUserTypeActivity
 import com.android.enmycity.openUserMainActivity
 import com.android.enmycity.user.AccountCreationPreferences
@@ -33,6 +34,8 @@ import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.observers.DisposableObserver
 import io.reactivex.schedulers.Schedulers
+import kotlinx.android.synthetic.main.hola.button
+import kotlinx.android.synthetic.main.hola.constraintLayout
 import org.jetbrains.anko.alert
 
 class MainActivity : AppCompatActivity() {
@@ -46,6 +49,7 @@ class MainActivity : AppCompatActivity() {
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
+//    setTransactions()
     setContentView(R.layout.activity_main)
     setLocationPermission()
   }
@@ -178,5 +182,25 @@ class MainActivity : AppCompatActivity() {
         }
         .observeOn(AndroidSchedulers.mainThread())
         .subscribe { Log.i(word, "Consuming item $it on ${Thread.currentThread().name}") }
+  }
+
+  private fun setTransactions() {
+    setContentView(R.layout.hola)
+    val constraintSet1 = ConstraintSet()
+    constraintSet1.clone(constraintLayout)
+    val constraintSet2 = ConstraintSet()
+    constraintSet2.clone(constraintLayout)
+    constraintSet2.centerVertically(R.id.imageView, 0)
+    constraintSet2.constrainHeight(R.id.imageView,300)
+    constraintSet2.constrainWidth(R.id.imageView,300)
+    var changed = false
+
+    button.setOnClickListener {
+      val transaction = AutoTransition().apply { duration = 1000 }
+      TransitionManager.beginDelayedTransition(constraintLayout, transaction)
+      val constraint = if (changed) constraintSet1 else constraintSet2
+      constraint.applyTo(constraintLayout)
+      changed = !changed
+    }
   }
 }
