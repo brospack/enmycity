@@ -70,7 +70,7 @@ class LoginPresenter(private val firabaseAuthentication: FirebaseAuth,
 
   private fun obtainUserData(documentSnapshot: DocumentSnapshot) {
     val accountPreferences = documentSnapshot.toObject(AccountPreferencesDao::class.java)
-    if (accountPreferences.isLocal && accountPreferences.isTraveller) {
+    if (accountPreferences!!.isLocal && accountPreferences.isTraveller) {
       view.goToLoadUserTypeActivity()
     } else if (accountPreferences.isTraveller) {
       getTravellerAccount()
@@ -94,7 +94,7 @@ class LoginPresenter(private val firabaseAuthentication: FirebaseAuth,
         .get()
         .addOnSuccessListener {
           if (it.exists()) {
-            loadUserInPreferences(it.toObject(UserDao::class.java), typeUser)
+            loadUserInPreferences(it.toObject(UserDao::class.java)!!, typeUser)
             view.goToMainActivity()
           } else view.goToSelectUserTypeActivity()
         }

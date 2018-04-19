@@ -86,8 +86,8 @@ class SearchFragment : Fragment(), SearchView, GoogleApiClient.OnConnectionFaile
     (requestCode == RESULT_CODE_PLACE_AUTOCOMPLETE && resultCode == RESULT_OK).let {
       val place = PlaceAutocomplete.getPlace(context, data)
 //      showLocation(place.latLng.latitude, place.latLng.longitude)
-      val placeData = place.viewport.northeast.toString() + place.viewport.southwest.toString()
-      presenter.search(LatLngBounds(place.viewport.southwest, place.viewport.northeast))
+      val placeData = place.viewport?.northeast.toString() + place.viewport?.southwest.toString()
+      presenter.search(LatLngBounds(place.viewport?.southwest, place.viewport?.northeast))
       search_places_floatingActionButton.visibility = VISIBLE
 //      activity?.longToast(placeData)
     }

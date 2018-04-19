@@ -51,7 +51,7 @@ class LoadUserTypeActivity : AppCompatActivity() {
         .get()
         .addOnSuccessListener {
           if (it.exists()) {
-            loadUserInPreferences(it.toObject(UserDao::class.java), type)
+            loadUserInPreferences(it.toObject(UserDao::class.java)!!, type)
           }
         }
   }
