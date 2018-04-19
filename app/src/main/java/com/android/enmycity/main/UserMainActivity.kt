@@ -12,6 +12,7 @@ import com.android.enmycity.R
 import com.android.enmycity.matches.MatchesFragment
 import com.android.enmycity.messages.MessagesFragment
 import com.android.enmycity.search.SearchFragment
+import com.android.enmycity.settings.SettingsFragment
 import com.android.enmycity.user.UserFragment
 import com.google.android.gms.location.places.ui.PlacePicker
 import kotlinx.android.synthetic.main.activity_user_main.search_results_bottomNavigationView
@@ -25,6 +26,7 @@ class UserMainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationI
       R.id.bottomNavigationMenu_user -> replaceFragment(UserFragment())
       R.id.bottomNavigationMenu_matches -> replaceFragment(MatchesFragment())
       R.id.bottomNavigationMenu_messages -> replaceFragment(MessagesFragment())
+      R.id.bottomNavigationMenu_settings -> replaceFragment(SettingsFragment())
       else -> true
     }
   }

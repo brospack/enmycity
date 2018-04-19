@@ -24,4 +24,10 @@
       android:title="@string/bottomNavigationMenu_messages"
       android:icon="@drawable/ic_message_white_24dp"
       />
+  <item
+      android:id="@+id/bottomNavigationMenu_settings"
+      android:enabled="true"
+      android:title="settings"
+      android:icon="@drawable/ic_home_black_24dp"
+      />
 </menu>

@@ -1,21 +1,23 @@
 package com.android.enmycity.search
 
 import android.content.Context
-import android.media.Image
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
-import android.widget.Toast
 import com.android.enmycity.R
 import com.android.enmycity.data.UserDao
+import com.android.enmycity.profile.ProfileActivity
+import com.android.enmycity.profile.ProfileViewModel
 import com.bumptech.glide.Glide
+import io.reactivex.subjects.PublishSubject
 
 class ProfilesAdapter(private val elements: List<UserDao>, private val context: Context) :
     RecyclerView.Adapter<ProfilesAdapter.ProfilesView>() {
 
+  val itemClickStream: PublishSubject<View> = PublishSubject.create()
   override fun getItemCount() = elements.size
 
   override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ProfilesView {
@@ -31,10 +33,13 @@ class ProfilesAdapter(private val elements: List<UserDao>, private val context: 
     private val nameTextView by lazy { view.findViewById<TextView>(R.id.viewUserProfile_name) }
     private val avatarImageView by lazy { view.findViewById<ImageView>(R.id.viewUserProfile_avatar_imageView) }
 
-    fun bind(profileViewModel: UserDao) {
-      nameTextView.text = profileViewModel.name
-      Glide.with(context).load(profileViewModel.photoUrl).into(avatarImageView)
-      itemView.setOnClickListener {Toast.makeText(context,"hola",Toast.LENGTH_SHORT).show() }
+    fun bind(userDao: UserDao) {
+      nameTextView.text = userDao.name
+      Glide.with(context).load(userDao.photoUrl).into(avatarImageView)
+      val profileViewModel = with(userDao) {
+        ProfileViewModel(name, coffeeLanguage, nightLife, localShopping, gastronomicTour, cityTour, sportBreak, volunteering, photoUrl)
+      }
+      itemView.setOnClickListener { ProfileActivity.open(profileViewModel, context) }
     }
   }
 }
