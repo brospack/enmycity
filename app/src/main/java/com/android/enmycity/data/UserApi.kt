@@ -10,7 +10,7 @@ class UserApi(private val firebaseFirestore: FirebaseFirestore = FirebaseFiresto
     val docRefer = firebaseFirestore.collection("locals").document(email)
     docRefer.get().addOnSuccessListener {
       if (it.exists()) {
-        userDao = it.toObject(UserDao::class.java)
+        userDao = it.toObject(UserDao::class.java)!!
       }
     }
     return userDao

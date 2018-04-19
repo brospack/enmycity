@@ -112,8 +112,8 @@ class SearchPresenter(private val userSharedPreferences: UserSharedPreferences,
   private fun showElementsInView(documents: List<DocumentSnapshot>) {
     val users = mutableListOf<UserDao>()
     documents.forEach {
-      users.add(it.toObject(UserDao::class.java));
-      addUserInList(it.toObject(UserDao::class.java))
+      users.add(it.toObject(UserDao::class.java)!!);
+      addUserInList(it.toObject(UserDao::class.java)!!)
     }
   }
 
