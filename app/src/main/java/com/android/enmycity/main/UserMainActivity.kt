@@ -15,9 +15,11 @@ import com.android.enmycity.search.SearchFragment
 import com.android.enmycity.settings.SettingsFragment
 import com.android.enmycity.user.UserFragment
 import com.google.android.gms.location.places.ui.PlacePicker
+import com.google.firebase.iid.FirebaseInstanceId
 import kotlinx.android.synthetic.main.activity_user_main.search_results_bottomNavigationView
 import kotlinx.android.synthetic.main.fragment_search.search_places_floatingActionButton
 import org.jetbrains.anko.longToast
+import org.jetbrains.anko.toast
 
 class UserMainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemSelectedListener {
   override fun onNavigationItemSelected(item: MenuItem): Boolean {
