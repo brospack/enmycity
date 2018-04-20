@@ -28,6 +28,6 @@
       android:id="@+id/bottomNavigationMenu_settings"
       android:enabled="true"
       android:title="settings"
-      android:icon="@drawable/ic_home_black_24dp"
+      android:icon="@drawable/ic_settings_white_24dp"
       />
 </menu>

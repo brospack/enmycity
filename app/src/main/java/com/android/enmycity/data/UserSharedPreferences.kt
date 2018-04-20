@@ -7,8 +7,7 @@ import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 
 class UserSharedPreferences(context: Context,
-                            private val gson: Gson = Gson()
-) {
+                            private val gson: Gson = Gson()) {
   companion object {
     private const val TRAVELLER_USER = "USER_ACCOUNT_PREFERENCES_TRAVELLER_ACCOUNT"
     private const val LOCAL_USER = "USER_ACCOUNT_PREFERENCES_LOCAL_ACCOUNT"
