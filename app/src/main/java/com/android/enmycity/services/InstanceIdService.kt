@@ -21,14 +21,14 @@ class InstanceIdService : FirebaseInstanceIdService() {
 
   private fun saveTokenInServer(token: String) {
     if (isUserLogged()) {
-      val email = userSharedPreferences.getCurrentUser().email
-
-      val documentReference = firestore.collection("devices").document(email)
-
-      firestore.runTransaction {
-        val snapshot = it.get(documentReference)
-
-      }
+//      val email = userSharedPreferences.getCurrentUser().email
+//
+//      val documentReference = firestore.collection("devices").document(email)
+//
+//      firestore.runTransaction {
+//        val snapshot = it.get(documentReference)
+//
+//      }
 
     }
   }

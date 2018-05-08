@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <string name="user_updated_message">Datos actualizados</string>
+  <string name="user_updated_failed_message">No se han actuaizado los datos</string>
+</resources>

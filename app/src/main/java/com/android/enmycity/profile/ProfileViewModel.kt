@@ -11,7 +11,8 @@ class ProfileViewModel(val name: String,
                        val cityTour: Boolean,
                        val sportBreak: Boolean,
                        val volunteering: Boolean,
-                       val photoUrl: String) : Parcelable {
+                       val photoUrl: String,
+                       val email:String) : Parcelable {
   constructor(parcel: Parcel) : this(
       parcel.readString(),
       parcel.readByte() != 0.toByte(),
@@ -21,6 +22,7 @@ class ProfileViewModel(val name: String,
       parcel.readByte() != 0.toByte(),
       parcel.readByte() != 0.toByte(),
       parcel.readByte() != 0.toByte(),
+      parcel.readString(),
       parcel.readString()) {
   }
 
@@ -34,6 +36,7 @@ class ProfileViewModel(val name: String,
     parcel.writeByte(if (sportBreak) 1 else 0)
     parcel.writeByte(if (volunteering) 1 else 0)
     parcel.writeString(photoUrl)
+    parcel.writeString(email)
   }
 
   override fun describeContents(): Int {
@@ -49,4 +52,5 @@ class ProfileViewModel(val name: String,
       return arrayOfNulls(size)
     }
   }
+
 }

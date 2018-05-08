@@ -37,7 +37,7 @@ class ProfilesAdapter(private val elements: List<UserDao>, private val context: 
       nameTextView.text = userDao.name
       Glide.with(context).load(userDao.photoUrl).into(avatarImageView)
       val profileViewModel = with(userDao) {
-        ProfileViewModel(name, coffeeLanguage, nightLife, localShopping, gastronomicTour, cityTour, sportBreak, volunteering, photoUrl)
+        ProfileViewModel(name, coffeeLanguage, nightLife, localShopping, gastronomicTour, cityTour, sportBreak, volunteering, photoUrl, email)
       }
       itemView.setOnClickListener { ProfileActivity.open(profileViewModel, context) }
     }

@@ -5,12 +5,13 @@ import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.View.GONE
+import android.view.View.VISIBLE
 import android.view.ViewGroup
+import android.widget.Switch
 import com.android.enmycity.R
 import com.android.enmycity.data.UserDao
 import com.android.enmycity.data.UserSharedPreferences
 import com.bumptech.glide.Glide
-import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.android.synthetic.main.fragment_user_profile.user_ProgressBar
 import kotlinx.android.synthetic.main.fragment_user_profile.user_avatar_imageView
 import kotlinx.android.synthetic.main.fragment_user_profile.user_cityTour_switch
@@ -19,8 +20,12 @@ import kotlinx.android.synthetic.main.fragment_user_profile.user_gastronomicTour
 import kotlinx.android.synthetic.main.fragment_user_profile.user_localShopping_switch
 import kotlinx.android.synthetic.main.fragment_user_profile.user_name_textView
 import kotlinx.android.synthetic.main.fragment_user_profile.user_nightLife_switch
+import kotlinx.android.synthetic.main.fragment_user_profile.user_save_floatingActionButton
 import kotlinx.android.synthetic.main.fragment_user_profile.user_sportBreak_switch
+import kotlinx.android.synthetic.main.fragment_user_profile.user_view
 import kotlinx.android.synthetic.main.fragment_user_profile.user_volunteering_switch
+import org.jetbrains.anko.childrenSequence
+import org.jetbrains.anko.toast
 
 class UserFragment : Fragment(), UserView {
   /*
@@ -35,7 +40,9 @@ class UserFragment : Fragment(), UserView {
   subThoroughfare-> 129
   url ->
    */
-  private val presenter: UserPresenter by lazy { UserPresenter(UserSharedPreferences(context!!), FirebaseFirestore.getInstance()) }
+  private val presenter: UserPresenter by lazy { UserPresenter(UserSharedPreferences(context!!)) }
+  private lateinit var lastInterests: String
+  private lateinit var user: UserDao
 
   override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
     return inflater.inflate(R.layout.fragment_user_profile, container, false)
@@ -45,34 +52,25 @@ class UserFragment : Fragment(), UserView {
     super.onViewCreated(view, savedInstanceState)
     presenter.setView(this)
     presenter.onViewReady()
-    val userSharedPreferences = UserSharedPreferences(view.context)
-//    val latitude = userSharedPreferences.getCurrentUser().location.latitude
-//    val longitude = userSharedPreferences.getCurrentUser().location.longitude
-//
-//    val geocoder = Geocoder(view.context)
-//    val addresses = geocoder.getFromLocation(latitude, longitude, 1)
-//
-//    addresses.first()?.let {
-//      userProfile_name_TextView.text = userSharedPreferences.getCurrentUser().name
-//      userProfile_country_TextView.text = it.countryName ?: ""
-//      userProfile_city_TextView.text = it.adminArea ?: ""
-//      userProfile_zipCode_TextView.text = it.postalCode ?: ""
-//      userProfile_location_TextView.text = it.locality ?: ""
-//    }
-//
-//    button2.setOnClickListener {
-//      initPlacePicker();
-//    }
+    user_save_floatingActionButton.setOnClickListener {
+      val userUpdated = user.copy(
+          coffeeLanguage = user_coffeeLanguage_switch.isChecked,
+          nightLife = user_nightLife_switch.isChecked,
+          localShopping = user_localShopping_switch.isChecked,
+          gastronomicTour = user_gastronomicTour_switch.isChecked,
+          cityTour = user_cityTour_switch.isChecked,
+          sportBreak = user_sportBreak_switch.isChecked,
+          volunteering = user_volunteering_switch.isChecked
+      )
+      presenter.onUserUpdated(userUpdated)
+    }
   }
 
-  //  private fun initPlacePicker() {
-//    val builder = PlacePicker.IntentBuilder()
-//    activity?.startActivityForResult(builder.build(activity), 999)
-//  }
   override fun showUserData(userDao: UserDao) {
+    user = userDao
     with(userDao) {
       showImage(photoUrl)
-      user_name_textView.text = name
+      user_name_textView.text = userDao.name
       user_coffeeLanguage_switch.isChecked = coffeeLanguage
       user_nightLife_switch.isChecked = nightLife
       user_localShopping_switch.isChecked = localShopping
@@ -81,10 +79,42 @@ class UserFragment : Fragment(), UserView {
       user_sportBreak_switch.isChecked = sportBreak
       user_volunteering_switch.isChecked = volunteering
     }
+
+    lastInterests = getInterestsValues()
+
+    user_view.childrenSequence().filter { it is Switch }
+        .map { (it as Switch) }
+        .iterator().forEach { it.setOnCheckedChangeListener { _, _ -> showSaveButton() } }
+
     user_ProgressBar.visibility = GONE
   }
 
-  private fun showImage(url: String) {
-    Glide.with(context).load(url).into(user_avatar_imageView)
+  override fun showSuccessfulUpdateMessage() {
+    activity?.toast(getString(R.string.user_updated_message))
   }
+
+  override fun showErrorUpdatingData(message:String) {
+    activity?.toast(message)
+//    activity?.toast(getString(R.string.user_updated_failed_message))
+  }
+
+  private fun showImage(url: String) = Glide.with(context)
+      .load(url)
+      .into(user_avatar_imageView)
+
+  private fun showSaveButton() = with(user_save_floatingActionButton) {
+    visibility = if (!interestsAreChanged()) VISIBLE else GONE
+  }
+
+  private fun interestsAreChanged() = lastInterests == getInterestsValues()
+
+  private fun getInterestsValues() = getSwitchValue(user_coffeeLanguage_switch) +
+      getSwitchValue(user_nightLife_switch) +
+      getSwitchValue(user_localShopping_switch) +
+      getSwitchValue(user_gastronomicTour_switch) +
+      getSwitchValue(user_cityTour_switch) +
+      getSwitchValue(user_sportBreak_switch) +
+      getSwitchValue(user_volunteering_switch)
+
+  private fun getSwitchValue(switch: Switch) = if (switch.isChecked) "1" else "0"
 }

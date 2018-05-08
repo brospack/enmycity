@@ -4,4 +4,8 @@ import com.android.enmycity.data.UserDao
 
 interface UserView {
   fun showUserData(userDao: UserDao)
+
+  fun showSuccessfulUpdateMessage()
+
+  fun showErrorUpdatingData(message: String)
 }
