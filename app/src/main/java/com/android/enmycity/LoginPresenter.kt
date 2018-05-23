@@ -5,11 +5,10 @@ import com.android.enmycity.data.UserDao
 import com.android.enmycity.data.UserSharedPreferences
 import com.android.enmycity.user.AccountCreationPreferences
 import com.facebook.AccessToken
-import com.google.firebase.auth.FacebookAuthProvider
-import com.google.firebase.auth.FirebaseAuth
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount
+import com.google.firebase.auth.*
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
-import org.json.JSONObject
 
 class LoginPresenter(private val firabaseAuthentication: FirebaseAuth,
                      private val accountCreationPreferences: AccountCreationPreferences,
@@ -32,25 +31,30 @@ class LoginPresenter(private val firabaseAuthentication: FirebaseAuth,
     }
   }
 
-  fun loginFacebookUser(accessToken: AccessToken) {
-    val facebookCredential = FacebookAuthProvider.getCredential(accessToken.token)
-    firabaseAuthentication.signInWithCredential(facebookCredential)
+
+  fun loginGoogleUser(googleSignInAccount: GoogleSignInAccount) = signInUser(
+      GoogleAuthProvider.getCredential(googleSignInAccount.idToken, null))
+
+  fun loginFacebookUser(accessToken: AccessToken) = signInUser(FacebookAuthProvider.getCredential(accessToken.token))
+
+  private fun signInUser(credential: AuthCredential) {
+    firabaseAuthentication
+        .signInWithCredential(credential)
         .addOnCompleteListener {
           if (it.isSuccessful) {
-            view.createUser(accessToken)
+            saveFirebaseUser(it.result.user)
           }
         }
+        .addOnFailureListener { view.showLoginError(it.message ?: "") }
   }
 
-  fun saveUserDataInPreferences(jsonObject: JSONObject) {
+
+  private fun saveFirebaseUser(firebaseUser: FirebaseUser) {
     with(accountCreationPreferences) {
-      saveUserId(jsonObject.getString("id"))
-      saveUserName(jsonObject.getString("name"))
-      saveUserEmail(jsonObject.getString("email"))
-      saveUserGender(jsonObject.getString("gender"))
-      saveUserBirthday(jsonObject.getString("birthday"))
-      saveUserCity(jsonObject.getJSONObject("location").getString("name"))
-      saveUserAvatar("http://graph.facebook.com/${jsonObject.getString("id")}/picture?type=large")
+      saveUserId(firebaseUser.uid)
+      saveUserName(firebaseUser?.displayName ?: "")
+      saveUserEmail(firebaseUser?.email ?: "")
+      saveUserAvatar(firebaseUser?.photoUrl.toString())
     }
     checkIfUserExists()
   }
@@ -79,13 +83,11 @@ class LoginPresenter(private val firabaseAuthentication: FirebaseAuth,
     }
   }
 
-  private fun getLocalAccount() {
-    getAccount("locals")
-  }
+  private fun getLocalAccount() = getAccount("locals")
 
-  private fun getTravellerAccount() {
-    getAccount("travellers")
-  }
+
+  private fun getTravellerAccount() = getAccount("travellers")
+
 
   private fun getAccount(typeUser: String) {
     FirebaseFirestore.getInstance()

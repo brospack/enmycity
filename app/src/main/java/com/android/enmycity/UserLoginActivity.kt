@@ -18,13 +18,16 @@ import com.facebook.CallbackManager
 import com.facebook.FacebookCallback
 import com.facebook.FacebookException
 import com.facebook.FacebookSdk
-import com.facebook.GraphRequest
 import com.facebook.appevents.AppEventsLogger
 import com.facebook.login.LoginResult
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInClient
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.android.gms.common.api.ApiException
 import com.google.firebase.auth.FirebaseAuth
-import kotlinx.android.synthetic.main.activity_login.login_facebook_button
-import kotlinx.android.synthetic.main.activity_login.login_progress_bar
+import kotlinx.android.synthetic.main.activity_login.*
 import org.jetbrains.anko.alert
+import org.jetbrains.anko.toast
 
 class UserLoginActivity : AppCompatActivity(), LoginView {
   private val callbackManager = CallbackManager.Factory.create()
@@ -33,10 +36,12 @@ class UserLoginActivity : AppCompatActivity(), LoginView {
     LoginPresenter(FirebaseAuth.getInstance(), AccountCreationPreferences(this),
         UserSharedPreferences(this))
   }
+  private lateinit var googleSigInClient: GoogleSignInClient
 
   companion object {
     private const val REQUEST_CODE_SETTINGS = 1
-    private val PERMISSIONS = listOf("email", "public_profile", "user_birthday", "user_location")
+    private const val REQUEST_CODE_GOOGLE = 9001
+    private val PERMISSIONS = listOf("email", "public_profile")
   }
 
   override fun onCreate(savedInstanceState: Bundle?) {
@@ -53,6 +58,7 @@ class UserLoginActivity : AppCompatActivity(), LoginView {
     val location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER)
     if (location != null) {
       initFacebookButton()
+      initGoogleButton()
       presenter.saveLocationInPreferences(location.latitude, location.longitude)
     } else {
       showsLocationsDialog()
@@ -85,6 +91,14 @@ class UserLoginActivity : AppCompatActivity(), LoginView {
     super.onActivityResult(requestCode, resultCode, data)
     if (requestCode == REQUEST_CODE_SETTINGS) {
       presenter.onViewReady()
+    } else if (requestCode == REQUEST_CODE_GOOGLE) {
+      val task = GoogleSignIn.getSignedInAccountFromIntent(data)
+      try {
+        val account = task.getResult(ApiException::class.java)
+        presenter.loginGoogleUser(account)
+      } catch (e: ApiException) {
+        toast(e.cause?.message.toString())
+      }
     }
     callbackManager.onActivityResult(requestCode, resultCode, data)
   }
@@ -109,16 +123,37 @@ class UserLoginActivity : AppCompatActivity(), LoginView {
     login_facebook_button.registerCallback(callbackManager, facebookCallback)
   }
 
-  override fun createUser(accessToken: AccessToken) {
-    val graphJsonCallback = GraphRequest.GraphJSONObjectCallback { jsonObject, _ ->
-      run {
-        presenter.saveUserDataInPreferences(jsonObject)
-      }
-    }
-    GraphRequest.newMeRequest(accessToken, graphJsonCallback).apply {
-      parameters = Bundle().apply { putString("fields", "id,name,email,gender,birthday,location") }
-      executeAsync()
-    }
+  private fun initGoogleButton() {
+    login_google_SignInButton.visibility = VISIBLE
+    val googleSigInOptions = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+        .requestIdToken(getString(R.string.google_login_token))
+        .requestEmail()
+        .requestProfile()
+        .build()
+    googleSigInClient = GoogleSignIn.getClient(this, googleSigInOptions)
+
+    login_google_SignInButton.setOnClickListener { signInWithGoogle() }
+  }
+
+  private fun signInWithGoogle() {
+    startActivityForResult(googleSigInClient.signInIntent, REQUEST_CODE_GOOGLE)
+  }
+
+//  override fun createUser(accessToken: AccessToken) {
+//    val graphJsonCallback = GraphRequest.GraphJSONObjectCallback { jsonObject, _ ->
+//      run {
+//        presenter.saveFacebookUserDataInPreferences(jsonObject)
+//      }
+//    }
+//    GraphRequest.newMeRequest(accessToken, graphJsonCallback).apply {
+//      parameters = Bundle().apply { putString("fields", "id,name,email,gender,birthday,location") }
+//      executeAsync()
+//    }
+//  }
+
+
+  override fun showLoginError(message: String) {
+    toast(message)
   }
 
   override fun goToLoadUserTypeActivity() {

@@ -3,7 +3,8 @@ package com.android.enmycity.data
 import com.google.firebase.firestore.GeoPoint
 import java.util.Date
 
-data class UserDao(val name: String = "",
+data class UserDao(val uid: String = "",
+                   val name: String = "",
                    val email: String = "",
                    val photoUrl: String = "",
                    val gender: Int = 0,

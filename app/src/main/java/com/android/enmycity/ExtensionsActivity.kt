@@ -5,7 +5,6 @@ import android.app.Activity
 import com.android.enmycity.interests.InterestsActivity
 import com.android.enmycity.main.MainActivity
 import com.android.enmycity.main.UserMainActivity
-import com.android.enmycity.profile.ProfileActivity
 import com.android.enmycity.search.SearchActivity
 import com.android.enmycity.user.SelectTypeUserActivity
 import org.jetbrains.anko.startActivity
