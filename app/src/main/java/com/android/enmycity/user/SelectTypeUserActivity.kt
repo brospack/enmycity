@@ -7,7 +7,6 @@ import com.android.enmycity.R
 import com.android.enmycity.openInterestsActivity
 import com.bumptech.glide.Glide
 import kotlinx.android.synthetic.main.activity_select_type_user.selectTypeUser_avatar_imageView
-import kotlinx.android.synthetic.main.activity_select_type_user.selectTypeUser_city_textView
 import kotlinx.android.synthetic.main.activity_select_type_user.selectTypeUser_local_switch
 import kotlinx.android.synthetic.main.activity_select_type_user.selectTypeUser_name_textView
 import kotlinx.android.synthetic.main.activity_select_type_user.selectTypeUser_next_floatingActionButton
@@ -27,7 +26,6 @@ class SelectTypeUserActivity : AppCompatActivity() {
     accountCreationPreferences.let {
       showUserImage(it.getUserAvatar())
       showUserName(it.getUserName())
-      showUserCity(it.getUserCity())
     }
   }
 
@@ -37,10 +35,6 @@ class SelectTypeUserActivity : AppCompatActivity() {
 
   private fun showUserName(userName: String) {
     selectTypeUser_name_textView.text = userName
-  }
-
-  private fun showUserCity(city: String) {
-    selectTypeUser_city_textView.text = city
   }
 
   private fun toggle(switch: Switch, isChecked: Boolean) {

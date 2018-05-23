@@ -58,11 +58,10 @@ class InterestsActivity : AppCompatActivity() {
 
     with(accountCreationPreferences) {
       val user = UserDao(
+          uid = getUserId(),
           name = getUserName(),
           email = getUserEmail(),
           photoUrl = getUserAvatar(),
-          gender = getUserGender(),
-          birthday = getUserBirthday(),
           statusId = 1,
           coffeeLanguage = interests_coffeeLanguage_switch.isChecked,
           nightLife = interests_nightLife_switch.isChecked,
@@ -73,7 +72,6 @@ class InterestsActivity : AppCompatActivity() {
           volunteering = interests_volunteering_switch.isChecked,
           postalCode = addresses.first()?.postalCode?.toInt() ?: 0,
           location = GeoPoint(getLatitude(), getLongitude()),
-          city = getUserCity(),
           adminArea = addresses.first()?.adminArea ?: "",
           subAdminArea = addresses.first()?.subAdminArea ?: "")
 

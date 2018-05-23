@@ -30,24 +30,13 @@
       app:layout_constraintEnd_toEndOf="parent"
       android:layout_marginEnd="8dp"
       />
-  <TextView
-      android:layout_width="161dp"
-      android:layout_height="33dp"
-      android:id="@+id/selectTypeUser_city_textView"
-      android:layout_marginTop="16dp"
-      app:layout_constraintTop_toBottomOf="@+id/selectTypeUser_name_textView"
-      app:layout_constraintStart_toStartOf="parent"
-      android:layout_marginStart="8dp"
-      app:layout_constraintEnd_toEndOf="parent"
-      android:layout_marginEnd="8dp"
-      />
   <Switch
       android:text="local"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
       android:id="@+id/selectTypeUser_local_switch"
       android:layout_marginTop="24dp"
-      app:layout_constraintTop_toBottomOf="@+id/selectTypeUser_city_textView"
+      app:layout_constraintTop_toBottomOf="@+id/selectTypeUser_name_textView"
       app:layout_constraintStart_toStartOf="parent"
       android:layout_marginStart="8dp"
       app:layout_constraintEnd_toEndOf="parent"
