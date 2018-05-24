@@ -26,7 +26,7 @@ android {
 }
 
 dependencies {
-  implementation "com.google.firebase:firebase-core:15.0.2"
+  implementation "com.google.firebase:firebase-core:16.0.0"
   implementation fileTree(dir: 'libs', include: ['*.jar'])
   androidTestImplementation('com.android.support.test.espresso:espresso-core:2.2.2', {
     exclude group: 'com.android.support', module: 'support-annotations'
@@ -42,14 +42,14 @@ dependencies {
   implementation 'com.google.android.gms:play-services-places:15.0.1'
   implementation 'com.google.android.gms:play-services-auth:15.0.1'
   implementation "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
-  implementation 'org.jetbrains.anko:anko-commons:0.10.4'
+  implementation 'org.jetbrains.anko:anko-commons:0.10.5'
   implementation 'com.facebook.android:facebook-android-sdk:4.5.0'
   implementation 'com.google.code.gson:gson:2.8.2'
-  implementation 'com.google.firebase:firebase-auth:15.1.0'
-  implementation 'com.google.firebase:firebase-firestore:16.0.0'
-  implementation 'com.google.firebase:firebase-messaging:15.0.2'
-  implementation 'com.google.firebase:firebase-database:15.0.1'
-  implementation "com.google.firebase:firebase-functions:15.0.0"
+  implementation 'com.google.firebase:firebase-auth:16.0.1'
+  implementation 'com.google.firebase:firebase-firestore:17.0.1'
+  implementation 'com.google.firebase:firebase-messaging:17.0.0'
+  implementation 'com.google.firebase:firebase-database:16.0.1'
+  implementation "com.google.firebase:firebase-functions:16.0.1"
   implementation 'com.github.bumptech.glide:glide:4.3.1'
   implementation 'io.reactivex.rxjava2:rxjava:2.1.12'
   implementation 'io.reactivex.rxjava2:rxandroid:2.0.2'
