@@ -7,24 +7,20 @@ import android.support.v4.app.Fragment
 import android.support.v7.app.AppCompatActivity
 import android.view.MenuItem
 import com.android.enmycity.R
-import com.android.enmycity.data.model.DeviceToken
-import com.android.enmycity.data.model.Tokens
-import com.android.enmycity.matches.MatchesFragment
+import com.android.enmycity.matches.ProposeFragment
 import com.android.enmycity.messages.MessagesFragment
 import com.android.enmycity.search.SearchFragment
+import com.android.enmycity.services.SaveTokenUseCase
 import com.android.enmycity.settings.SettingsFragment
 import com.android.enmycity.user.UserFragment
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.iid.FirebaseInstanceId
 import kotlinx.android.synthetic.main.activity_user_main.search_results_bottomNavigationView
-import org.jetbrains.anko.toast
 
 class UserMainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemSelectedListener {
   override fun onNavigationItemSelected(item: MenuItem): Boolean {
     return when (item.itemId) {
       R.id.bottomNavigationMenu_search -> replaceFragment(SearchFragment())
       R.id.bottomNavigationMenu_user -> replaceFragment(UserFragment())
-      R.id.bottomNavigationMenu_matches -> replaceFragment(MatchesFragment())
+      R.id.bottomNavigationMenu_matches -> replaceFragment(ProposeFragment())
       R.id.bottomNavigationMenu_messages -> replaceFragment(MessagesFragment())
       R.id.bottomNavigationMenu_settings -> replaceFragment(SettingsFragment())
       else -> true
@@ -42,10 +38,11 @@ class UserMainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationI
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     setContentView(R.layout.activity_user_main)
+    SaveTokenUseCase(this).saveToken()
     if (intent.extras != null) {
       val value = intent.extras?.getInt("hola", 0)
       if (value == 1) {
-        replaceFragment(MatchesFragment())
+        replaceFragment(ProposeFragment())
       } else {
         replaceFragment(SearchFragment())
       }

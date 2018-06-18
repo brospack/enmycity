@@ -1,33 +1,33 @@
 package com.android.enmycity.profile
 
+import com.android.enmycity.common.FirestoreCollectionNames
 import com.android.enmycity.data.UserSharedPreferences
-import com.google.android.gms.tasks.Task
-import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.functions.FirebaseFunctions
-import java.util.HashMap
+import com.android.enmycity.matches.ProposeDto
+import com.google.firebase.firestore.FirebaseFirestore
 
-class ProfilePresenter(private val firebaseDatabase: FirebaseDatabase,
-                       private val userSharedPreferences: UserSharedPreferences) {
+class ProfilePresenter(
+    private val firebaseFirestore: FirebaseFirestore,
+    private val userSharedPreferences: UserSharedPreferences
+) {
   private lateinit var view: ProfileView
 
   fun setView(profileView: ProfileView) {
     view = profileView
   }
 
-  fun onProposeCreated(email:String){
-    val db = firebaseDatabase.reference
-    addMessage("hola")
-        .addOnCompleteListener {  }
-
-  }
-
-  private fun addMessage(text:String): Task<String>{
-    val functions = FirebaseFunctions.getInstance()
-    val data = HashMap<String,String>()
-    data.put("ola","k ase")
-
-    return functions.getHttpsCallable("addMessage")
-        .call(data)
-        .continueWith { it.result.data.toString()}
+  fun onProposeCreated(profileViewModel: ProfileViewModel, message: String = "") {
+    val mainUser = userSharedPreferences.getCurrentUser()
+    val propose = ProposeDto(
+        proponentUid = mainUser.uid,
+        proponentName = mainUser.name,
+        proponentPhoto = mainUser.photoUrl,
+        proposerUid = profileViewModel.uid,
+        proposerName = profileViewModel.name,
+        proposerPhoto = profileViewModel.photoUrl,
+        message = message
+    )
+    firebaseFirestore.collection(FirestoreCollectionNames.PROPOSALS).add(propose)
+        .addOnCompleteListener { if (it.isSuccessful) view.proposeSendedMessage() else view.proposeDidntSended() }
+        .addOnFailureListener { view.proposeDidntSended() }
   }
 }

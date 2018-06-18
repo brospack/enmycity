@@ -2,6 +2,7 @@ package com.android.enmycity.settings
 
 import com.android.enmycity.data.UserSharedPreferences
 import com.facebook.login.LoginManager
+import com.google.android.gms.common.api.GoogleApiClient
 import com.google.firebase.auth.FirebaseAuth
 
 class SettingsPresenter(private val userSharedPreferences: UserSharedPreferences,

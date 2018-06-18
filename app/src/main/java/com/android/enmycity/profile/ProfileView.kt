@@ -4,4 +4,6 @@ import com.android.enmycity.data.UserDao
 
 interface ProfileView {
   fun showData(userDao: UserDao)
+  fun proposeSendedMessage()
+  fun proposeDidntSended()
 }

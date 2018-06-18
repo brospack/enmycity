@@ -8,14 +8,15 @@ import com.android.enmycity.R
 import com.android.enmycity.data.UserDao
 import com.android.enmycity.data.UserSharedPreferences
 import com.bumptech.glide.Glide
-import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.android.synthetic.main.activity_profile.profile_avatar_imageView
 import kotlinx.android.synthetic.main.activity_profile.profile_contact_floatingActionButton
 import kotlinx.android.synthetic.main.activity_profile.profile_name_textView
+import org.jetbrains.anko.toast
 
 class ProfileActivity : AppCompatActivity(), ProfileView {
   private val presenter: ProfilePresenter by lazy {
-    ProfilePresenter(FirebaseDatabase.getInstance(),
+    ProfilePresenter(FirebaseFirestore.getInstance(),
         UserSharedPreferences(this))
   }
   private lateinit var profileViewModel: ProfileViewModel
@@ -39,7 +40,7 @@ class ProfileActivity : AppCompatActivity(), ProfileView {
       showName(name)
     }
     profile_contact_floatingActionButton.setOnClickListener {
-      presenter.onProposeCreated(profileViewModel.email)
+      presenter.onProposeCreated(profileViewModel)
     }
   }
 
@@ -52,5 +53,13 @@ class ProfileActivity : AppCompatActivity(), ProfileView {
   }
 
   override fun showData(userDao: UserDao) {
+  }
+
+  override fun proposeSendedMessage() {
+    toast("OK")
+  }
+
+  override fun proposeDidntSended() {
+    toast("KO")
   }
 }

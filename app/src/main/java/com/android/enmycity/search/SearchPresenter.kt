@@ -41,10 +41,10 @@ class SearchPresenter(private val userSharedPreferences: UserSharedPreferences,
     val travellersSearch = firestore.collection("searchTest")
 
     travellersSearch
-        .whereLessThanOrEqualTo("latitude",northEast.latitude)
+        .whereLessThanOrEqualTo("latitude", northEast.latitude)
         .whereLessThanOrEqualTo("longitude", northEast.longitude)
-        .whereGreaterThanOrEqualTo("latitude",southWest.latitude)
-        .whereGreaterThanOrEqualTo("longitude",southWest.longitude)
+        .whereGreaterThanOrEqualTo("latitude", southWest.latitude)
+        .whereGreaterThanOrEqualTo("longitude", southWest.longitude)
 
         .get()
         .addOnCompleteListener {
@@ -55,8 +55,8 @@ class SearchPresenter(private val userSharedPreferences: UserSharedPreferences,
           } else
             view.showMessage(it.exception?.message ?: "NOT SUCCESS")
         }
-        .addOnFailureListener{
-          view.showMessage(it.message?: "ERROR")
+        .addOnFailureListener {
+          view.showMessage(it.message ?: "ERROR")
         }
 
 //    getInterestForFilter().forEach {

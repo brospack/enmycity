@@ -9,6 +9,7 @@ import com.android.enmycity.R
 import com.android.enmycity.data.UserDao
 import com.android.enmycity.data.UserSharedPreferences
 import com.android.enmycity.openUserMainActivity
+import com.android.enmycity.services.SaveTokenUseCase
 import com.android.enmycity.user.AccountCreationPreferences
 import com.bumptech.glide.Glide
 import com.google.firebase.firestore.FirebaseFirestore
@@ -29,6 +30,7 @@ import org.jetbrains.anko.toast
 class InterestsActivity : AppCompatActivity() {
   private val accountCreationPreferences by lazy { AccountCreationPreferences(this) }
   private val userPreferences by lazy { UserSharedPreferences(this) }
+  private val saveTokenUseCase by lazy { SaveTokenUseCase(this) }
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
@@ -89,6 +91,7 @@ class InterestsActivity : AppCompatActivity() {
       true -> userPreferences.saveUserLocal(user)
       false -> userPreferences.saveUserTraveller(user)
     }
+    saveTokenUseCase.saveToken()
     accountCreationPreferences.clear()
   }
 }

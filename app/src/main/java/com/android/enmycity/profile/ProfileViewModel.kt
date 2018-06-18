@@ -12,7 +12,8 @@ class ProfileViewModel(val name: String,
                        val sportBreak: Boolean,
                        val volunteering: Boolean,
                        val photoUrl: String,
-                       val email:String) : Parcelable {
+                       val email: String,
+                       val uid: String) : Parcelable {
   constructor(parcel: Parcel) : this(
       parcel.readString(),
       parcel.readByte() != 0.toByte(),
@@ -23,8 +24,8 @@ class ProfileViewModel(val name: String,
       parcel.readByte() != 0.toByte(),
       parcel.readByte() != 0.toByte(),
       parcel.readString(),
-      parcel.readString()) {
-  }
+      parcel.readString(),
+      parcel.readString())
 
   override fun writeToParcel(parcel: Parcel, flags: Int) {
     parcel.writeString(name)
@@ -37,20 +38,14 @@ class ProfileViewModel(val name: String,
     parcel.writeByte(if (volunteering) 1 else 0)
     parcel.writeString(photoUrl)
     parcel.writeString(email)
+    parcel.writeString(uid)
   }
 
-  override fun describeContents(): Int {
-    return 0
-  }
+  override fun describeContents() = 0
 
   companion object CREATOR : Parcelable.Creator<ProfileViewModel> {
-    override fun createFromParcel(parcel: Parcel): ProfileViewModel {
-      return ProfileViewModel(parcel)
-    }
+    override fun createFromParcel(parcel: Parcel) = ProfileViewModel(parcel)
 
-    override fun newArray(size: Int): Array<ProfileViewModel?> {
-      return arrayOfNulls(size)
-    }
+    override fun newArray(size: Int) = arrayOfNulls<ProfileViewModel?>(size)
   }
-
 }
