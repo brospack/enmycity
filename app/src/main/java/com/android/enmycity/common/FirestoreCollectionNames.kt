@@ -5,4 +5,6 @@ object FirestoreCollectionNames {
   const val PROPOSALS = "proposals"
   const val TRAVELLERS = "travellers"
   const val LOCALS = "locals"
+  const val USER_CHATS = "chats"
+//  sCq0aH2YYJRarthkq6NvmiWjnHd2
 }

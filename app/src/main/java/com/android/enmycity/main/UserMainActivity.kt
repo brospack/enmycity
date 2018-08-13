@@ -8,7 +8,7 @@ import android.support.v7.app.AppCompatActivity
 import android.view.MenuItem
 import com.android.enmycity.R
 import com.android.enmycity.matches.ProposeFragment
-import com.android.enmycity.messages.MessagesFragment
+import com.android.enmycity.chats.ChatsFragment
 import com.android.enmycity.search.SearchFragment
 import com.android.enmycity.services.SaveTokenUseCase
 import com.android.enmycity.settings.SettingsFragment
@@ -21,7 +21,7 @@ class UserMainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationI
       R.id.bottomNavigationMenu_search -> replaceFragment(SearchFragment())
       R.id.bottomNavigationMenu_user -> replaceFragment(UserFragment())
       R.id.bottomNavigationMenu_matches -> replaceFragment(ProposeFragment())
-      R.id.bottomNavigationMenu_messages -> replaceFragment(MessagesFragment())
+      R.id.bottomNavigationMenu_messages -> replaceFragment(ChatsFragment())
       R.id.bottomNavigationMenu_settings -> replaceFragment(SettingsFragment())
       else -> true
     }

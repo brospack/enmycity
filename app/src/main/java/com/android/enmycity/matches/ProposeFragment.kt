@@ -14,6 +14,7 @@ import com.android.enmycity.data.UserSharedPreferences
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.android.synthetic.main.fragment_propose.propose_progressBar
 import kotlinx.android.synthetic.main.fragment_propose.propose_proposes_recyclerView
+import org.jetbrains.anko.toast
 
 class ProposeFragment : Fragment(), ProposeView {
   private val presenter: ProposePresenter by lazy { ProposePresenter(UserSharedPreferences(context!!), FirebaseFirestore.getInstance()) }
@@ -24,9 +25,9 @@ class ProposeFragment : Fragment(), ProposeView {
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
+    initRecyclerView()
     presenter.setView(this)
     presenter.onViewReady()
-    initRecyclerView()
   }
 
   private fun initRecyclerView() {
@@ -44,7 +45,7 @@ class ProposeFragment : Fragment(), ProposeView {
   }
 
   override fun showEmptyData() {
-    TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    context?.toast("GOLA")
   }
 
   override fun showLoading() {
@@ -54,5 +55,4 @@ class ProposeFragment : Fragment(), ProposeView {
   override fun hideLoading() {
     propose_progressBar.visibility = GONE
   }
-
 }

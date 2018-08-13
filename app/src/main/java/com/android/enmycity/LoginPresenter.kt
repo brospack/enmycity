@@ -10,9 +10,11 @@ import com.google.firebase.auth.*
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 
-class LoginPresenter(private val firabaseAuthentication: FirebaseAuth,
-                     private val accountCreationPreferences: AccountCreationPreferences,
-                     private val userSharedPreferences: UserSharedPreferences) {
+class LoginPresenter(
+    private val firebaseAuth: FirebaseAuth,
+    private val accountCreationPreferences: AccountCreationPreferences,
+    private val userSharedPreferences: UserSharedPreferences
+) {
 
   private lateinit var view: LoginView
 
@@ -31,14 +33,13 @@ class LoginPresenter(private val firabaseAuthentication: FirebaseAuth,
     }
   }
 
-
   fun loginGoogleUser(googleSignInAccount: GoogleSignInAccount) = signInUser(
       GoogleAuthProvider.getCredential(googleSignInAccount.idToken, null))
 
   fun loginFacebookUser(accessToken: AccessToken) = signInUser(FacebookAuthProvider.getCredential(accessToken.token))
 
   private fun signInUser(credential: AuthCredential) {
-    firabaseAuthentication
+    firebaseAuth
         .signInWithCredential(credential)
         .addOnCompleteListener {
           if (it.isSuccessful) {
@@ -47,7 +48,6 @@ class LoginPresenter(private val firabaseAuthentication: FirebaseAuth,
         }
         .addOnFailureListener { view.showLoginError(it.message ?: "") }
   }
-
 
   private fun saveFirebaseUser(firebaseUser: FirebaseUser) {
     with(accountCreationPreferences) {
@@ -61,8 +61,8 @@ class LoginPresenter(private val firabaseAuthentication: FirebaseAuth,
 
   private fun checkIfUserExists() {
     FirebaseFirestore.getInstance()
-        .collection("accountPreferences")
-        .document(accountCreationPreferences.getUserEmail())
+        .collection("users")
+        .document(firebaseAuth.uid ?: "")
         .get()
         .addOnSuccessListener {
           when (it.exists()) {
@@ -73,21 +73,18 @@ class LoginPresenter(private val firabaseAuthentication: FirebaseAuth,
   }
 
   private fun obtainUserData(documentSnapshot: DocumentSnapshot) {
-    val accountPreferences = documentSnapshot.toObject(AccountPreferencesDao::class.java)
-    if (accountPreferences!!.isLocal && accountPreferences.isTraveller) {
-      view.goToLoadUserTypeActivity()
-    } else if (accountPreferences.isTraveller) {
-      getTravellerAccount()
-    } else {
-      getLocalAccount()
+    val user = documentSnapshot.toObject(AccountPreferencesDao::class.java) ?: AccountPreferencesDao()
+
+    when (user.type) {
+      3 -> view.goToLoadUserTypeActivity()
+      2 -> getLocalAccount()
+      1 -> getTravellerAccount()
     }
   }
 
   private fun getLocalAccount() = getAccount("locals")
 
-
   private fun getTravellerAccount() = getAccount("travellers")
-
 
   private fun getAccount(typeUser: String) {
     FirebaseFirestore.getInstance()

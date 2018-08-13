@@ -68,7 +68,7 @@ class MainActivity : AppCompatActivity() {
 
           override fun onPermissionDenied(response: PermissionDeniedResponse?) {
             showSnack(R.string.userLogin_permission_denied_advice_messa,
-                R.string.userlogin_accept_permission_button, { goToPermissions() })
+                R.string.userlogin_accept_permission_button) { goToPermissions() }
           }
         }).check()
   }
@@ -84,10 +84,7 @@ class MainActivity : AppCompatActivity() {
   private fun checkIfLocationIsActive() {
     val location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER)
     if (location != null) {
-      when (isUserLogged()) {
-        true -> getUserData()
-        false -> proceedToLogin(location)
-      }
+      if (isUserLogged()) getUserData() else proceedToLogin(location)
     } else {
       showsLocationsDialog()
     }
@@ -103,12 +100,12 @@ class MainActivity : AppCompatActivity() {
 
   private fun showsLocationsDialog() {
     alert(R.string.userLogin_allow_location_message) {
-      positiveButton(R.string.accept, { openSettings() })
-      negativeButton(R.string.cancel, {
+      positiveButton(R.string.accept) { openSettings() }
+      negativeButton(R.string.cancel) {
         showSnack(R.string.userlogin_open_settings_message,
-            R.string.userlogin_open_settings_button,
-            { openSettings() })
-      })
+            R.string.userlogin_open_settings_button
+        ) { openSettings() }
+      }
     }.show()
   }
 
@@ -145,7 +142,6 @@ class MainActivity : AppCompatActivity() {
         }
         .subscribeWith(object : DisposableObserver<Int>() {
           override fun onComplete() {
-
           }
 
           override fun onNext(t: Int) {
@@ -154,9 +150,7 @@ class MainActivity : AppCompatActivity() {
           }
 
           override fun onError(e: Throwable) {
-
           }
-
         })
 
     val integerObservable = Observable.just(1, 2, 3, 4, 5, 6)
@@ -191,8 +185,8 @@ class MainActivity : AppCompatActivity() {
     val constraintSet2 = ConstraintSet()
     constraintSet2.clone(constraintLayout)
     constraintSet2.centerVertically(R.id.imageView, 0)
-    constraintSet2.constrainHeight(R.id.imageView,300)
-    constraintSet2.constrainWidth(R.id.imageView,300)
+    constraintSet2.constrainHeight(R.id.imageView, 300)
+    constraintSet2.constrainWidth(R.id.imageView, 300)
     var changed = false
 
     button.setOnClickListener {

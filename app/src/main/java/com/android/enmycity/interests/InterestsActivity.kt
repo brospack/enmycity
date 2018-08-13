@@ -79,8 +79,7 @@ class InterestsActivity : AppCompatActivity() {
 
       FirebaseFirestore.getInstance()
           .collection(getUserType())
-          .document(getUserEmail())
-          .set(user)
+          .add(user)
           .addOnSuccessListener { saveUserInPreferences(user); openUserMainActivity() }
           .addOnFailureListener { Log.i("Fail saving", it.message) }
     }

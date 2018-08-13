@@ -1,7 +1,7 @@
 package com.android.enmycity.matches
 
+import com.android.enmycity.chats.ChatDto
 import com.android.enmycity.common.FirestoreCollectionNames
-import com.android.enmycity.common.StatusId
 import com.android.enmycity.data.UserSharedPreferences
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -14,34 +14,33 @@ class ProposePresenter(private val userSharedPreferences: UserSharedPreferences,
   }
 
   fun onViewReady() {
-    val userUid = FirebaseAuth.getInstance().uid
+    getPendingProposals()
+    getUserProposals()
+  }
 
-    firestore.collection(FirestoreCollectionNames.PROPOSALS)
-        .whereEqualTo("proponentUid", userUid)
+  private fun getUserProposals() {
+  }
+
+  private fun getPendingProposals() {
+    val userType = userSharedPreferences.getCurrentUserType()
+    val userUid = FirebaseAuth.getInstance().uid
+    firestore.collection(FirestoreCollectionNames.USER_CHATS)
+        .whereEqualTo("ownerId", userUid)
         .get()
         .addOnSuccessListener {
           if (!it.isEmpty) {
-            it.documents.map { it.toObject(ProposeDto::class.java) ?: ProposeDto() }
-                .filter { it.status == StatusId.PENDING }
-                .map { ProposeViewModel(it.proposerUid, it.status, it.proposerName, it.proposerPhoto, isProponent = true) }
+            it.documents.map { it.toObject(ChatDto::class.java) ?: ChatDto() }
+                .filter { it.status == 1 }
+                .filter { it.ownerId == userUid }
+                .map { ProposeViewModel(it.localId, it.status, it.guestName, it.guestPhoto, isProponent = true) }
                 .forEach {
-                  view.hideLoading()
                   view.showPropose(it)
                 }
           }
         }
-
-    firestore.collection(FirestoreCollectionNames.PROPOSALS)
-        .whereEqualTo("proposerUid", userUid)
-        .get()
-        .addOnSuccessListener {
-          it.documents.map { it.toObject(ProposeDto::class.java) ?: ProposeDto() }
-              .filter { it.status == StatusId.PENDING }
-              .map { ProposeViewModel(it.proposerUid, it.status, it.proposerName, it.proposerPhoto, isProponent = false) }
-              .forEach {
-                view.hideLoading()
-                view.showPropose(it)
-              }
+        .addOnFailureListener { view.showEmptyData() }
+        .addOnCompleteListener {
+          view.hideLoading()
         }
   }
 }
