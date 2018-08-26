@@ -28,6 +28,7 @@
       android:roundIcon="@mipmap/ic_launcher_round"
       android:supportsRtl="true"
       android:theme="@style/AppTheme"
+      android:name=".ApplicationBase"
       >
     <meta-data
         android:name="com.facebook.sdk.ApplicationId"
@@ -69,7 +70,7 @@
         <data android:scheme="@string/fb_login_protocol_scheme"/>
       </intent-filter>
     </activity>
-    <activity android:name=".main.MainActivity">
+    <activity android:name=".main.InitActivity">
       <intent-filter>
         <action android:name="android.intent.action.MAIN"/>
 
@@ -77,8 +78,8 @@
       </intent-filter>
     </activity>
     <activity android:name=".UserLoginActivity"/>
-    <activity android:name=".interests.InterestsActivity"/>
-    <activity android:name=".user.SelectTypeUserActivity"/>
+    <activity android:name=".accountCreation.InterestsActivity"/>
+    <activity android:name=".accountCreation.selectTypeUser.SelectTypeUserActivity"/>
     <activity android:name=".search.SearchActivity"/>
     <activity android:name=".main.UserMainActivity"/>
     <activity android:name=".profile.ProfileActivity"/>

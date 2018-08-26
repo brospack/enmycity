@@ -1,13 +1,14 @@
 package com.android.enmycity
 
-import com.android.enmycity.data.AccountPreferencesDao
+import com.android.enmycity.accountCreation.selectTypeUser.UserAccountDao
+import com.android.enmycity.common.FirestoreCollectionNames
+import com.android.enmycity.data.MapUserLoggedFromUserDao
 import com.android.enmycity.data.UserDao
 import com.android.enmycity.data.UserSharedPreferences
 import com.android.enmycity.user.AccountCreationPreferences
 import com.facebook.AccessToken
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.firebase.auth.*
-import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 
 class LoginPresenter(
@@ -43,66 +44,57 @@ class LoginPresenter(
         .signInWithCredential(credential)
         .addOnCompleteListener {
           if (it.isSuccessful) {
-            saveFirebaseUser(it.result.user)
+            saveFirebaseUserInPreferences(it.result.user)
           }
         }
-        .addOnFailureListener { view.showLoginError(it.message ?: "") }
+        .addOnFailureListener { view.showLoginError(it.message.orEmpty()) }
   }
 
-  private fun saveFirebaseUser(firebaseUser: FirebaseUser) {
+  private fun saveFirebaseUserInPreferences(firebaseUser: FirebaseUser) {
     with(accountCreationPreferences) {
       saveUserId(firebaseUser.uid)
-      saveUserName(firebaseUser?.displayName ?: "")
-      saveUserEmail(firebaseUser?.email ?: "")
-      saveUserAvatar(firebaseUser?.photoUrl.toString())
+      saveUserName(firebaseUser.displayName.orEmpty())
+      saveUserEmail(firebaseUser.email.orEmpty())
+      saveUserAvatar(firebaseUser.photoUrl.toString())
     }
     checkIfUserExists()
   }
 
   private fun checkIfUserExists() {
     FirebaseFirestore.getInstance()
-        .collection("users")
-        .document(firebaseAuth.uid ?: "")
+        .collection(FirestoreCollectionNames.USERS)
+        .document(firebaseAuth.uid.orEmpty())
         .get()
         .addOnSuccessListener {
-          when (it.exists()) {
-            true -> obtainUserData(it)
-            false -> view.goToSelectUserTypeActivity()
-          }
+          val userAccountDao = it.toObject(UserAccountDao::class.java) ?: UserAccountDao()
+          if (it.exists()) obtainUserData(userAccountDao) else view.goToSelectUserTypeActivity()
         }
   }
 
-  private fun obtainUserData(documentSnapshot: DocumentSnapshot) {
-    val user = documentSnapshot.toObject(AccountPreferencesDao::class.java) ?: AccountPreferencesDao()
-
-    when (user.type) {
+  private fun obtainUserData(userAccountDao: UserAccountDao) {
+    when (userAccountDao.type) {
       3 -> view.goToLoadUserTypeActivity()
-      2 -> getLocalAccount()
-      1 -> getTravellerAccount()
+      2 -> getLocalAccount(userAccountDao.localId)
+      1 -> getTravellerAccount(userAccountDao.travellerId)
     }
   }
 
-  private fun getLocalAccount() = getAccount("locals")
+  private fun getLocalAccount(localId: String) = getAccount(FirestoreCollectionNames.LOCALS, localId)
 
-  private fun getTravellerAccount() = getAccount("travellers")
+  private fun getTravellerAccount(travellerId: String) = getAccount(FirestoreCollectionNames.TRAVELLERS, travellerId)
 
-  private fun getAccount(typeUser: String) {
+  private fun getAccount(collectionName: String, documentId: String) {
     FirebaseFirestore.getInstance()
-        .collection(typeUser)
-        .document(accountCreationPreferences.getUserEmail())
+        .collection(collectionName)
+        .document(documentId)
         .get()
         .addOnSuccessListener {
           if (it.exists()) {
-            loadUserInPreferences(it.toObject(UserDao::class.java)!!, typeUser)
+            val userDao = it.toObject(UserDao::class.java) ?: UserDao()
+            val userLogged = MapUserLoggedFromUserDao().map(userDao, collectionName, it.id)
+            userSharedPreferences.saveUserLogged(userLogged)
             view.goToMainActivity()
           } else view.goToSelectUserTypeActivity()
         }
-  }
-
-  private fun loadUserInPreferences(userDao: UserDao, typeUser: String) {
-    when (typeUser) {
-      "locals" -> userSharedPreferences.saveUserLocal(userDao)
-      "travellers" -> userSharedPreferences.saveUserTraveller(userDao)
-    }
   }
 }

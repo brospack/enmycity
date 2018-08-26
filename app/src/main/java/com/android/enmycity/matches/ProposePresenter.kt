@@ -22,9 +22,8 @@ class ProposePresenter(private val userSharedPreferences: UserSharedPreferences,
   }
 
   private fun getPendingProposals() {
-    val userType = userSharedPreferences.getCurrentUserType()
     val userUid = FirebaseAuth.getInstance().uid
-    firestore.collection(FirestoreCollectionNames.USER_CHATS)
+    firestore.collection(FirestoreCollectionNames.CHATS)
         .whereEqualTo("ownerId", userUid)
         .get()
         .addOnSuccessListener {
@@ -32,7 +31,7 @@ class ProposePresenter(private val userSharedPreferences: UserSharedPreferences,
             it.documents.map { it.toObject(ChatDto::class.java) ?: ChatDto() }
                 .filter { it.status == 1 }
                 .filter { it.ownerId == userUid }
-                .map { ProposeViewModel(it.localId, it.status, it.guestName, it.guestPhoto, isProponent = true) }
+                .map { ProposeViewModel(it.ownerId, it.status, it.guestName, it.guestPhoto, isProponent = true) }
                 .forEach {
                   view.showPropose(it)
                 }

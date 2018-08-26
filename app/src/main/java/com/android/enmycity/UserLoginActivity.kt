@@ -151,7 +151,6 @@ class UserLoginActivity : AppCompatActivity(), LoginView {
 //    }
 //  }
 
-
   override fun showLoginError(message: String) {
     toast(message)
   }

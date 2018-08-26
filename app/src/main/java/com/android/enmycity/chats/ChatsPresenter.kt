@@ -16,11 +16,8 @@ class ChatsPresenter(
   }
 
   fun onViewReady() {
-    val user = userSharedPreferences.getCurrentUser()
-    val userType = userSharedPreferences.getCurrentUserType()
-
-    firebaseFirestore.collection(FirestoreCollectionNames.USER_CHATS)
-        .whereEqualTo("uid", userSharedPreferences.getCurrentUser().uid)
+    firebaseFirestore.collection(FirestoreCollectionNames.CHATS)
+        .whereEqualTo("uid", userSharedPreferences.getUserLogged().uid)
         .get()
         .addOnSuccessListener {
           if (!it.isEmpty) {

@@ -2,16 +2,16 @@ package com.android.enmycity
 
 import android.app.Activity
 
-import com.android.enmycity.interests.InterestsActivity
-import com.android.enmycity.main.MainActivity
+import com.android.enmycity.accountCreation.InterestsActivity
+import com.android.enmycity.main.InitActivity
 import com.android.enmycity.main.UserMainActivity
 import com.android.enmycity.search.SearchActivity
-import com.android.enmycity.user.SelectTypeUserActivity
+import com.android.enmycity.accountCreation.selectTypeUser.SelectTypeUserActivity
 import org.jetbrains.anko.startActivity
 
 fun Activity.openMainActivity() {
-  startActivity<MainActivity>()
-  finish()
+  startActivity<InitActivity>()
+  this.finish()
 }
 
 fun Activity.openLoginActivity() {
@@ -26,7 +26,7 @@ fun Activity.openSelectUserTypeActivity() {
 
 fun Activity.openInterestsActivity() {
   startActivity<InterestsActivity>()
-  finish()
+  this.finish()
 }
 
 fun Activity.openSearchActivity() {

@@ -2,13 +2,16 @@ package com.android.enmycity.search
 
 import com.android.enmycity.data.UserDao
 import com.android.enmycity.data.UserSharedPreferences
+import com.android.enmycity.user.model.UserType
 import com.google.android.gms.maps.model.LatLngBounds
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.GeoPoint
 
-class SearchPresenter(private val userSharedPreferences: UserSharedPreferences,
-                      private val firestore: FirebaseFirestore) {
+class SearchPresenter(
+    private val userSharedPreferences: UserSharedPreferences,
+    private val firestore: FirebaseFirestore
+) {
   companion object {
     private const val CITY_TOUR = "cityTour"
     private const val COFFEE_LANGUAGE = "coffeeLanguage"
@@ -29,9 +32,9 @@ class SearchPresenter(private val userSharedPreferences: UserSharedPreferences,
   }
 
   fun onViewReady() {
-    when (userSharedPreferences.getCurrentUserType()) {
-      UserSharedPreferences.USER_TYPE_TRAVELLER -> searchLocalProfiles()
-      UserSharedPreferences.USER_TYPE_LOCAL -> searchTravellerProfiles()
+    when (userSharedPreferences.getUserLogged().userType) {
+      UserType.TRAVELLER -> searchLocalProfiles()
+      UserType.LOCAL -> searchTravellerProfiles()
     }
   }
 
@@ -80,7 +83,7 @@ class SearchPresenter(private val userSharedPreferences: UserSharedPreferences,
             showElementsInView(it.result.documents)
           }
         }
-    userSharedPreferences.getUserLocal().let {
+    userSharedPreferences.getUserLogged().let {
       view.showMessage("You are local: ${it.name}")
 
     }
@@ -112,7 +115,7 @@ class SearchPresenter(private val userSharedPreferences: UserSharedPreferences,
   private fun showElementsInView(documents: List<DocumentSnapshot>) {
     val users = mutableListOf<UserDao>()
     documents.forEach {
-      users.add(it.toObject(UserDao::class.java)!!);
+      users.add(it.toObject(UserDao::class.java)!!)
       addUserInList(it.toObject(UserDao::class.java)!!)
     }
   }
@@ -124,7 +127,7 @@ class SearchPresenter(private val userSharedPreferences: UserSharedPreferences,
   }
 
   private fun getInterestForFilter() =
-      with(userSharedPreferences.getCurrentUser()) {
+      with(userSharedPreferences.getUserLogged()) {
         val interests = mutableListOf<String>()
         if (coffeeLanguage) interests.add(COFFEE_LANGUAGE)
         if (cityTour) interests.add(CITY_TOUR)
@@ -137,8 +140,8 @@ class SearchPresenter(private val userSharedPreferences: UserSharedPreferences,
       }
 
   private fun getLocation() {
-    val latitude = userSharedPreferences.getCurrentUser().location.latitude
-    val longitude = userSharedPreferences.getCurrentUser().location.longitude
+    val latitude = userSharedPreferences.getUserLogged().location.latitude
+    val longitude = userSharedPreferences.getUserLogged().location.longitude
     view.showLocation(latitude, longitude)
     view.addProfiles(usersMap.values.toList())
     view.hideProgressBar()

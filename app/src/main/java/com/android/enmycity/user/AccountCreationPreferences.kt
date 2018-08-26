@@ -3,19 +3,21 @@ package com.android.enmycity.user
 import android.content.Context
 import android.content.SharedPreferences
 import android.preference.PreferenceManager
+import com.android.enmycity.common.FirestoreCollectionNames
 import com.android.enmycity.doubleToLongBits
 import com.android.enmycity.longBitsToDouble
 
 class AccountCreationPreferences(context: Context) {
   companion object {
     private const val USER_ID = "ACCOUNT_CREATION_PREFERENCES_USER_ID"
+    private const val USER_LOCAL_ID = "ACCOUNT_CREATION_PREFERENCES_USER_LOCAL_ID"
+    private const val USER_TRAVELLER_ID = "ACCOUNT_CREATION_PREFERENCES_USER_TRAVELLER_ID"
     private const val USER_NAME = "ACCOUNT_CREATION_PREFERENCES_NAME"
     private const val USER_EMAIL = "ACCOUNT_CREATION_PREFERENCES_EMAIL"
     private const val USER_AVATAR = "ACCOUNT_CREATION_PREFERENCES_AVATAR"
     private const val USER_IS_LOCAL = "ACCOUNT_CREATION_PREFERENCES_IS_LOCAL"
     private const val USER_LATITUDE = "ACCOUNT_CREATION_PREFERENCES_LATITUDE"
     private const val USER_LONGITUDE = "ACCOUNT_CREATION_PREFERENCES_LONGITUDE"
-
   }
 
   private val sharedPreferences: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
@@ -30,6 +32,14 @@ class AccountCreationPreferences(context: Context) {
   fun getUserId(): String = sharedPreferences.getString(USER_ID, "")
 
   fun saveUserName(name: String) = saveStringValue(USER_NAME, name)
+
+  fun saveUserLocalId(id: String) = saveStringValue(USER_LOCAL_ID, id)
+
+  fun getUserLocalId() = sharedPreferences.getString(USER_LOCAL_ID, "")
+
+  fun saveUserTravellerId(id: String) = saveStringValue(USER_TRAVELLER_ID, id)
+
+  fun getUserTravellerId() = sharedPreferences.getString(USER_TRAVELLER_ID, "")
 
   fun getUserName(): String = sharedPreferences.getString(USER_NAME, "")
 
@@ -57,13 +67,14 @@ class AccountCreationPreferences(context: Context) {
   fun getUserType() = sharedPreferences.getBoolean(USER_IS_LOCAL, false)
       .let {
         when (it) {
-          true -> "locals"
-          false -> "travellers"
+          true -> FirestoreCollectionNames.LOCALS
+          false -> FirestoreCollectionNames.TRAVELLERS
         }
       }
 
-  fun clear(): Any = editor.clear()
-
+  fun clear() {
+    editor.clear()
+  }
 
   private fun saveStringValue(preferenceName: String, value: String) = with(editor) {
     putString(preferenceName, value)

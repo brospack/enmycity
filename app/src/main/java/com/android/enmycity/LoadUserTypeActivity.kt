@@ -2,77 +2,55 @@ package com.android.enmycity
 
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
-import android.view.View.GONE
+import com.android.enmycity.common.FirestoreCollectionNames
+import com.android.enmycity.data.MapUserLoggedFromUserDao
 import com.android.enmycity.data.UserDao
+import com.android.enmycity.data.UserLogged
 import com.android.enmycity.data.UserSharedPreferences
+import com.android.enmycity.user.model.GenderType
+import com.android.enmycity.user.model.UserType
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.android.synthetic.main.activity_load_user_type.loadUserType_local
-import kotlinx.android.synthetic.main.activity_load_user_type.loadUserType_progressBar
 import kotlinx.android.synthetic.main.activity_load_user_type.loadUserType_traveller
 
 class LoadUserTypeActivity : AppCompatActivity() {
   private val userSharedPreferences by lazy { UserSharedPreferences(this) }
-  private var localSaved = false
-  private var travellerSaved = false
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     setContentView(R.layout.activity_load_user_type)
-    saveProfilesInPreferences()
     loadUserType_local.setOnClickListener {
-      userSharedPreferences.setLocalAsCurrent()
-      openSearchActivity()
+      loadLocalUser()
     }
     loadUserType_traveller.setOnClickListener {
-      userSharedPreferences.setTravellerAsCurrent()
-      openSearchActivity()
+      loadTravellerUser()
     }
   }
 
-  private fun saveProfilesInPreferences() {
-    loadLocalType()
-    loadTravellerType()
+  private fun loadLocalUser() {
+    getUserData(FirestoreCollectionNames.LOCALS)
   }
 
-  private fun loadLocalType() {
-    loadUserType("locals")
+  private fun loadTravellerUser() {
+    getUserData(FirestoreCollectionNames.TRAVELLERS)
   }
 
-  private fun loadTravellerType() {
-    loadUserType("travellers")
-  }
+  private fun getUserData(collection: String) {
+    val uid = FirebaseAuth.getInstance().uid
 
-  private fun loadUserType(type: String) {
-    val email = FirebaseAuth.getInstance().currentUser?.email ?: ""
     FirebaseFirestore.getInstance()
-        .collection(type)
-        .document(email)
+        .collection(collection)
+        .whereEqualTo("uid", uid)
         .get()
         .addOnSuccessListener {
-          if (it.exists()) {
-            loadUserInPreferences(it.toObject(UserDao::class.java)!!, type)
+          if (it.documents.isNotEmpty()) {
+            val document = it.documents.first()
+            val userDao: UserDao = document.toObject(UserDao::class.java) ?: UserDao()
+            val userLogged = MapUserLoggedFromUserDao().map(userDao, collection, document.id)
+            userSharedPreferences.saveUserLogged(userLogged)
+            openSearchActivity()
           }
         }
-  }
-
-  private fun loadUserInPreferences(userDao: UserDao, typeUser: String) {
-    when (typeUser) {
-      "locals" -> saveLocalInPreferences(userDao)
-      "travellers" -> saveTravellerInPreferences(userDao)
-    }
-    if (localSaved && travellerSaved) {
-      loadUserType_progressBar.visibility = GONE
-    }
-  }
-
-  private fun saveLocalInPreferences(userDao: UserDao) {
-    userSharedPreferences.saveUserLocal(userDao)
-    localSaved = true
-  }
-
-  private fun saveTravellerInPreferences(userDao: UserDao) {
-    userSharedPreferences.saveUserTraveller(userDao)
-    travellerSaved = true
   }
 }

@@ -1,4 +1,4 @@
-package com.android.enmycity.interests
+package com.android.enmycity.accountCreation
 
 import android.location.Geocoder
 import android.os.Bundle
@@ -6,7 +6,10 @@ import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.widget.Switch
 import com.android.enmycity.R
+import com.android.enmycity.common.FirestoreCollectionNames
+import com.android.enmycity.data.MapUserLoggedFromUserDao
 import com.android.enmycity.data.UserDao
+import com.android.enmycity.data.UserLogged
 import com.android.enmycity.data.UserSharedPreferences
 import com.android.enmycity.openUserMainActivity
 import com.android.enmycity.services.SaveTokenUseCase
@@ -59,7 +62,7 @@ class InterestsActivity : AppCompatActivity() {
     val addresses = Geocoder(this).getFromLocation(accountCreationPreferences.getLatitude(), accountCreationPreferences.getLongitude(), 1)
 
     with(accountCreationPreferences) {
-      val user = UserDao(
+      val userDao = UserDao(
           uid = getUserId(),
           name = getUserName(),
           email = getUserEmail(),
@@ -72,25 +75,38 @@ class InterestsActivity : AppCompatActivity() {
           cityTour = interests_cityTour_switch.isChecked,
           sportBreak = interests_sportBreak_switch.isChecked,
           volunteering = interests_volunteering_switch.isChecked,
-          postalCode = addresses.first()?.postalCode?.toInt() ?: 0,
+          postalCode = addresses.first()?.postalCode.orEmpty(),
           location = GeoPoint(getLatitude(), getLongitude()),
-          adminArea = addresses.first()?.adminArea ?: "",
-          subAdminArea = addresses.first()?.subAdminArea ?: "")
+          adminArea = addresses.first()?.adminArea.orEmpty(),
+          subAdminArea = addresses.first()?.subAdminArea.orEmpty())
+      val collectionName = getUserType()
 
       FirebaseFirestore.getInstance()
-          .collection(getUserType())
-          .add(user)
-          .addOnSuccessListener { saveUserInPreferences(user); openUserMainActivity() }
+          .collection(collectionName)
+          .add(userDao)
+          .addOnSuccessListener {
+            val userLogged = MapUserLoggedFromUserDao().map(userDao, collectionName, it.id)
+            saveUserInPreferences(userLogged)
+          }
           .addOnFailureListener { Log.i("Fail saving", it.message) }
     }
   }
 
-  private fun saveUserInPreferences(user: UserDao) {
-    when (accountCreationPreferences.getUserType() == "locals") {
-      true -> userPreferences.saveUserLocal(user)
-      false -> userPreferences.saveUserTraveller(user)
+  private fun saveUserInPreferences(userLogged: UserLogged) {
+    val fieldName = when (accountCreationPreferences.getUserType() == FirestoreCollectionNames.LOCALS) {
+      true -> "localId"
+      false -> "travellerId"
     }
-    saveTokenUseCase.saveToken()
-    accountCreationPreferences.clear()
+    FirebaseFirestore.getInstance()
+        .collection(FirestoreCollectionNames.USERS)
+        .document(accountCreationPreferences.getUserId())
+        .update(fieldName, userLogged.id)
+        .addOnSuccessListener {
+          userPreferences.saveUserLogged(userLogged)
+          saveTokenUseCase.saveToken()
+          accountCreationPreferences.clear()
+          openUserMainActivity()
+        }
+        .addOnFailureListener { }
   }
 }

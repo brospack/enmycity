@@ -6,7 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.android.enmycity.R
-import com.android.enmycity.data.UserDao
+import com.android.enmycity.data.UserLogged
 import com.android.enmycity.data.UserSharedPreferences
 import com.android.enmycity.openMainActivity
 import com.bumptech.glide.Glide
@@ -33,8 +33,8 @@ class SettingsFragment : Fragment(), SettingsView {
     settings_logout_button.setOnClickListener { presenter.onUserLogout() }
   }
 
-  override fun showUserData(userDao: UserDao) {
-    Glide.with(this).load(userDao.photoUrl).into(settings_avatar_imageView)
+  override fun showUserData(userLogged: UserLogged) {
+    Glide.with(this).load(userLogged.photoUrl).into(settings_avatar_imageView)
   }
 
   override fun showLogoutMessage() {

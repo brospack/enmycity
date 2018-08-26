@@ -16,8 +16,7 @@ import org.jetbrains.anko.toast
 
 class ProfileActivity : AppCompatActivity(), ProfileView {
   private val presenter: ProfilePresenter by lazy {
-    ProfilePresenter(FirebaseFirestore.getInstance(),
-        UserSharedPreferences(this))
+    ProfilePresenter(UserSharedPreferences(this))
   }
   private lateinit var profileViewModel: ProfileViewModel
 

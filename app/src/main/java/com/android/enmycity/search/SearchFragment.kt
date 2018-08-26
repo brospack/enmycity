@@ -14,6 +14,8 @@ import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.view.ViewGroup
 import com.android.enmycity.R
+import com.android.enmycity.accountCreation.selectTypeUser.UserAccountDao
+import com.android.enmycity.common.FirestoreCollectionNames
 import com.android.enmycity.data.UserDao
 import com.android.enmycity.data.UserSharedPreferences
 import com.google.android.gms.common.ConnectionResult
@@ -170,14 +172,21 @@ class SearchFragment : Fragment(), SearchView, GoogleApiClient.OnConnectionFaile
 
   private fun createUsers() {
     val db = FirebaseFirestore.getInstance()
-    var batch = db.batch()
+    var batchTravellers = db.batch()
+    var batchUsers = db.batch()
 
-    for (i in 1..3) {
-      val email = "test$i@mail.com"
+    for (i in 1..8) {
+      val email = "testTraveller0$i@mail.com"
+      val name = "traveller_$i"
+      val photo = "https://i.dawn.com/large/2016/11/582caa9db7dfa.jpg"
+      val uid = "xUiD-$i"
+      val travelerId = "Tr-id-$i"
+
       val user = UserDao(
-          name = "Dumi",
+          uid = uid,
+          name = name,
           email = email,
-          photoUrl = "https://i.dawn.com/large/2016/11/582caa9db7dfa.jpg",
+          photoUrl = photo,
           gender = 1,
           birthday = "17/07/1954",
           city = "Hamburgo",
@@ -189,38 +198,24 @@ class SearchFragment : Fragment(), SearchView, GoogleApiClient.OnConnectionFaile
           gastronomicTour = false,
           cityTour = false,
           sportBreak = false,
-          volunteering = false,
-          latitude = 41.550273,
-          longitude = 2.437302)
-      val documentReference = db.collection("searchTest").document(email)
-      batch.set(documentReference, user)
-    }
+          volunteering = false)
+      val documentReference = db.collection(FirestoreCollectionNames.TRAVELLERS).document(travelerId)
+      batchTravellers.set(documentReference, user)
 
-    for (i in 4..8) {
-      val email = "test$i@mail.com"
-      val user = UserDao(
-          name = "Dumi",
+      val userAccound = UserAccountDao(
+          uid = uid,
+          name = name,
           email = email,
-          photoUrl = "https://i.dawn.com/large/2016/11/582caa9db7dfa.jpg",
-          gender = 1,
-          birthday = "17/07/1954",
-          city = "Hamburgo",
-          statusId = 1,
-          location = GeoPoint(53.33, 10.00),
-          coffeeLanguage = true,
-          nightLife = true,
-          localShopping = true,
-          gastronomicTour = false,
-          cityTour = false,
-          sportBreak = false,
-          volunteering = false,
-          latitude = 41.541204,
-          longitude = 2.376715)
-      val documentReference = db.collection("searchTest").document(email)
-      batch.set(documentReference, user)
+          photo = photo,
+          type = 1,
+          travellerId = travelerId
+      )
+
+      val userDocumentReference = db.collection(FirestoreCollectionNames.USERS).document(uid)
+      batchUsers.set(userDocumentReference, userAccound)
     }
-    batch.commit().addOnCompleteListener {
-      if (it.isSuccessful && it.isComplete) activity?.toast("OK")
+    batchTravellers.commit().addOnCompleteListener {
+      batchUsers.commit()
     }
   }
 }

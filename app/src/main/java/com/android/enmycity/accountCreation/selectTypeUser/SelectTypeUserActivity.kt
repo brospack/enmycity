@@ -1,10 +1,11 @@
-package com.android.enmycity.user
+package com.android.enmycity.accountCreation.selectTypeUser
 
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.widget.Switch
 import com.android.enmycity.R
 import com.android.enmycity.openInterestsActivity
+import com.android.enmycity.user.AccountCreationPreferences
 import com.bumptech.glide.Glide
 import kotlinx.android.synthetic.main.activity_select_type_user.selectTypeUser_avatar_imageView
 import kotlinx.android.synthetic.main.activity_select_type_user.selectTypeUser_local_switch
@@ -12,29 +13,32 @@ import kotlinx.android.synthetic.main.activity_select_type_user.selectTypeUser_n
 import kotlinx.android.synthetic.main.activity_select_type_user.selectTypeUser_next_floatingActionButton
 import kotlinx.android.synthetic.main.activity_select_type_user.selectTypeUser_traveller_switch
 
-class SelectTypeUserActivity : AppCompatActivity() {
-  private val accountCreationPreferences by lazy { AccountCreationPreferences(this) }
+class SelectTypeUserActivity : AppCompatActivity(), SelectTypeUserView {
+  private val presenter by lazy { SelectTypeUserPresenter(AccountCreationPreferences(this)) }
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     setContentView(R.layout.activity_select_type_user)
-    showUserData()
+    presenter.setView(this)
+    presenter.onViewReady()
     setListeners()
   }
 
-  private fun showUserData() {
-    accountCreationPreferences.let {
-      showUserImage(it.getUserAvatar())
-      showUserName(it.getUserName())
-    }
+  override fun showUserImage(photoUrl: String) {
+    Glide.with(this)
+        .load(photoUrl)
+        .into(selectTypeUser_avatar_imageView)
   }
 
-  private fun showUserImage(photoUrl: String) {
-    Glide.with(this).load(photoUrl).into(selectTypeUser_avatar_imageView)
-  }
-
-  private fun showUserName(userName: String) {
+  override fun showUserName(userName: String) {
     selectTypeUser_name_textView.text = userName
+  }
+
+  override fun goToInterestsActivity() {
+    openInterestsActivity()
+  }
+
+  override fun showError() {
   }
 
   private fun toggle(switch: Switch, isChecked: Boolean) {
@@ -68,10 +72,9 @@ class SelectTypeUserActivity : AppCompatActivity() {
   private fun setNextFloatingActionButtonListener() {
     selectTypeUser_next_floatingActionButton.setOnClickListener {
       when (selectTypeUser_local_switch.isChecked) {
-        true -> accountCreationPreferences.setIsUserLocal(true)
-        false -> accountCreationPreferences.setIsUserLocal(false)
+        true -> presenter.onLocalCreated()
+        false -> presenter.onTravellerCreated()
       }
-      openInterestsActivity()
     }
   }
 }

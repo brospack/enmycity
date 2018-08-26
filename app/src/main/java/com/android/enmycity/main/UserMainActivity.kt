@@ -52,11 +52,9 @@ class UserMainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationI
     search_results_bottomNavigationView.setOnNavigationItemSelectedListener(this)
 //    replaceFragment(SearchFragment())
 //    val token = FirebaseInstanceId.getInstance().token
-
   }
 
   override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-    val hola = ""
 //    search_places_floatingActionButton.visibility = VISIBLE
 //    if (resultCode == Activity.RESULT_OK) {
 //      if (requestCode == RESULT_CODE_PLACE_AUTOCOMPLETE) {

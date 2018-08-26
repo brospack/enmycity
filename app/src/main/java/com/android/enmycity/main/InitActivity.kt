@@ -38,7 +38,7 @@ import kotlinx.android.synthetic.main.hola.button
 import kotlinx.android.synthetic.main.hola.constraintLayout
 import org.jetbrains.anko.alert
 
-class MainActivity : AppCompatActivity() {
+class InitActivity : AppCompatActivity() {
   private val userSharedPreferences: UserSharedPreferences by lazy { UserSharedPreferences(this) }
   private val locationManager: LocationManager by lazy { this.getSystemService(Context.LOCATION_SERVICE) as LocationManager }
   private val accountCreationPreferences: AccountCreationPreferences by lazy { AccountCreationPreferences(this) }
@@ -130,7 +130,7 @@ class MainActivity : AppCompatActivity() {
 
   private fun isUserLogged() = FirebaseAuth.getInstance().currentUser != null
 
-  private fun getUserData() = if (userSharedPreferences.isUserLoaded()) openUserMainActivity() else openSelectUserTypeActivity()
+  private fun getUserData() = if (userSharedPreferences.isUserLogged()) openUserMainActivity() else openSelectUserTypeActivity()
 
   private fun observableTest() {
     val word = "Thread"

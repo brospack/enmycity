@@ -1,22 +1,24 @@
 package com.android.enmycity.profile
 
+import com.android.enmycity.chats.ChatDto
 import com.android.enmycity.common.FirestoreCollectionNames
 import com.android.enmycity.data.UserSharedPreferences
 import com.android.enmycity.matches.ProposeDto
 import com.google.firebase.firestore.FirebaseFirestore
 
 class ProfilePresenter(
-    private val firebaseFirestore: FirebaseFirestore,
+
     private val userSharedPreferences: UserSharedPreferences
 ) {
   private lateinit var view: ProfileView
+  private val firestore = FirebaseFirestore.getInstance()
 
   fun setView(profileView: ProfileView) {
     view = profileView
   }
 
   fun onProposeCreated(profileViewModel: ProfileViewModel, message: String = "") {
-    val mainUser = userSharedPreferences.getCurrentUser()
+    val mainUser = userSharedPreferences.getUserLogged()
     val propose = ProposeDto(
         proponentUid = mainUser.uid,
         proponentName = mainUser.name,
@@ -26,7 +28,8 @@ class ProfilePresenter(
         proposerPhoto = profileViewModel.photoUrl,
         message = message
     )
-    firebaseFirestore.collection(FirestoreCollectionNames.PROPOSALS).add(propose)
+
+    firestore.collection(FirestoreCollectionNames.PROPOSALS).add(propose)
         .addOnCompleteListener { if (it.isSuccessful) view.proposeSendedMessage() else view.proposeDidntSended() }
         .addOnFailureListener { view.proposeDidntSended() }
   }

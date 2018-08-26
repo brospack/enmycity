@@ -1,8 +1,10 @@
 package com.android.enmycity.user
 
 import com.android.enmycity.Constants
-import com.android.enmycity.data.UserDao
+import com.android.enmycity.common.FirestoreCollectionNames
+import com.android.enmycity.data.UserLogged
 import com.android.enmycity.data.UserSharedPreferences
+import com.android.enmycity.user.model.UserType
 import com.google.firebase.firestore.FirebaseFirestore
 
 class UserPresenter(private val userSharedPreferences: UserSharedPreferences) {
@@ -13,34 +15,29 @@ class UserPresenter(private val userSharedPreferences: UserSharedPreferences) {
     this.view = view
   }
 
-  fun onViewReady() = view.showUserData(userSharedPreferences.getCurrentUser())
+  fun onViewReady() = view.showUserData(userSharedPreferences.getUserLogged())
 
-  fun onUserUpdated(userDao: UserDao) {
-    val email = userSharedPreferences.getCurrentUser().email
-    val userType = when (userSharedPreferences.getCurrentUserType()) {
-      UserSharedPreferences.USER_TYPE_LOCAL -> "locals"
-      UserSharedPreferences.USER_TYPE_TRAVELLER -> "travellers"
+  fun onUserUpdated(userUpdated: UserLogged) {
+    val documentId = userSharedPreferences.getUserLogged().id
+    val collectionName = when (userSharedPreferences.getUserLogged().userType) {
+      UserType.LOCAL -> FirestoreCollectionNames.LOCALS
+      UserType.TRAVELLER -> FirestoreCollectionNames.TRAVELLERS
       else -> ""
     }
     val values = mutableMapOf<String, Any>(
-        Constants.COFFEE_LANGUAGE to userDao.coffeeLanguage,
-        Constants.LOCAL_SHOPPING to userDao.localShopping,
-        Constants.VOLUNTEERING to userDao.volunteering,
-        Constants.SPORT_BREAK to userDao.sportBreak,
-        Constants.NIGHT_LIFE to userDao.nightLife,
-        Constants.GASTRONOMIC_TOUR to userDao.gastronomicTour,
-        Constants.CITY_TOUR to userDao.cityTour
+        Constants.COFFEE_LANGUAGE to userUpdated.coffeeLanguage,
+        Constants.LOCAL_SHOPPING to userUpdated.localShopping,
+        Constants.VOLUNTEERING to userUpdated.volunteering,
+        Constants.SPORT_BREAK to userUpdated.sportBreak,
+        Constants.NIGHT_LIFE to userUpdated.nightLife,
+        Constants.GASTRONOMIC_TOUR to userUpdated.gastronomicTour,
+        Constants.CITY_TOUR to userUpdated.cityTour
     )
 
-    firestore.collection(userType).document(email).update(values)
-        .addOnSuccessListener { saveInPreferences(userDao);view.showSuccessfulUpdateMessage() }
+    firestore.collection(collectionName)
+        .document(documentId)
+        .update(values)
+        .addOnSuccessListener { userSharedPreferences.saveUserLogged(userUpdated);view.showSuccessfulUpdateMessage() }
         .addOnFailureListener { view.showErrorUpdatingData(it.message ?: "") }
-  }
-
-  private fun saveInPreferences(userDao: UserDao) {
-    when (userSharedPreferences.getCurrentUserType()) {
-      UserSharedPreferences.USER_TYPE_LOCAL -> userSharedPreferences.saveUserLocal(userDao)
-      UserSharedPreferences.USER_TYPE_TRAVELLER -> userSharedPreferences.saveUserTraveller(userDao)
-    }
   }
 }
