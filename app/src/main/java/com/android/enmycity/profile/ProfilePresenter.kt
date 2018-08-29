@@ -2,8 +2,8 @@ package com.android.enmycity.profile
 
 import com.android.enmycity.chats.ChatDto
 import com.android.enmycity.common.FirestoreCollectionNames
+import com.android.enmycity.common.StatusId
 import com.android.enmycity.data.UserSharedPreferences
-import com.android.enmycity.matches.ProposeDto
 import com.google.firebase.firestore.FirebaseFirestore
 
 class ProfilePresenter(
@@ -18,18 +18,22 @@ class ProfilePresenter(
   }
 
   fun onProposeCreated(profileViewModel: ProfileViewModel, message: String = "") {
-    val mainUser = userSharedPreferences.getUserLogged()
-    val propose = ProposeDto(
-        proponentUid = mainUser.uid,
-        proponentName = mainUser.name,
-        proponentPhoto = mainUser.photoUrl,
-        proposerUid = profileViewModel.uid,
-        proposerName = profileViewModel.name,
-        proposerPhoto = profileViewModel.photoUrl,
-        message = message
+    val userLogged = userSharedPreferences.getUserLogged()
+
+    val chatDto = ChatDto(
+        status = StatusId.PENDING,
+        userType = userLogged.userType.id,
+        ownerId = userLogged.id,
+        ownerName = userLogged.name,
+        ownerPhoto = userLogged.photoUrl,
+        guestId = profileViewModel.id,
+        guestName = profileViewModel.name,
+        guestPhoto = profileViewModel.photoUrl,
+        userUid = userLogged.uid
     )
 
-    firestore.collection(FirestoreCollectionNames.PROPOSALS).add(propose)
+    firestore.collection(FirestoreCollectionNames.CHATS)
+        .add(chatDto)
         .addOnCompleteListener { if (it.isSuccessful) view.proposeSendedMessage() else view.proposeDidntSended() }
         .addOnFailureListener { view.proposeDidntSended() }
   }

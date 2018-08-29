@@ -41,12 +41,12 @@ class ProposesAdapter(
     private val acceptPropose by lazy { view.findViewById<Button>(R.id.viewPropose_accept_button) }
 
     fun bind(proposeViewModel: ProposeViewModel) {
-      name.text = proposeViewModel.name
-      Glide.with(context).load(proposeViewModel.photo).into(avatar)
-      if (proposeViewModel.isProponent) {
+      name.text = proposeViewModel.userName
+      Glide.with(context).load(proposeViewModel.userPhoto).into(avatar)
+      if (proposeViewModel.isOwner) {
         status.apply {
           visibility = VISIBLE
-          text = mapStatus(proposeViewModel.statusId)
+          text = "Pendiente"
         }
       } else {
         acceptPropose.apply {
@@ -55,11 +55,6 @@ class ProposesAdapter(
         }
       }
     }
-  }
-
-  private fun mapStatus(statusId: Int): String = when (statusId) {
-    StatusId.PENDING -> "Pendiente"
-    else -> ""
   }
 }
 

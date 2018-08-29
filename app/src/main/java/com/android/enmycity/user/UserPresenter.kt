@@ -2,7 +2,7 @@ package com.android.enmycity.user
 
 import com.android.enmycity.Constants
 import com.android.enmycity.common.FirestoreCollectionNames
-import com.android.enmycity.data.UserLogged
+import com.android.enmycity.data.User
 import com.android.enmycity.data.UserSharedPreferences
 import com.android.enmycity.user.model.UserType
 import com.google.firebase.firestore.FirebaseFirestore
@@ -17,7 +17,7 @@ class UserPresenter(private val userSharedPreferences: UserSharedPreferences) {
 
   fun onViewReady() = view.showUserData(userSharedPreferences.getUserLogged())
 
-  fun onUserUpdated(userUpdated: UserLogged) {
+  fun onUserUpdated(userUpdated: User) {
     val documentId = userSharedPreferences.getUserLogged().id
     val collectionName = when (userSharedPreferences.getUserLogged().userType) {
       UserType.LOCAL -> FirestoreCollectionNames.LOCALS

@@ -4,8 +4,8 @@ import com.android.enmycity.common.FirestoreCollectionNames
 import com.android.enmycity.user.model.GenderType
 import com.android.enmycity.user.model.UserType
 
-class MapUserLoggedFromUserDao() {
-  fun map(userDao: UserDao, collectionName: String, userId: String): UserLogged {
+class MapUserDaoToUser {
+  fun map(userDao: UserDao, collectionName: String, userId: String): User {
     val userType = when (collectionName) {
       FirestoreCollectionNames.TRAVELLERS -> UserType.TRAVELLER
       FirestoreCollectionNames.LOCALS -> UserType.LOCAL
@@ -18,7 +18,7 @@ class MapUserLoggedFromUserDao() {
       else -> GenderType.UNDEFINED
     }
     return with(userDao) {
-      UserLogged(uid = uid,
+      User(uid = uid,
           id = userId,
           userType = userType,
           photoUrl = photoUrl,

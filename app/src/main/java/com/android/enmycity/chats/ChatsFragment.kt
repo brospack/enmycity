@@ -2,19 +2,25 @@ package com.android.enmycity.chats
 
 import android.os.Bundle
 import android.support.v4.app.Fragment
+import android.support.v7.widget.LinearLayoutManager
 import android.view.LayoutInflater
 import android.view.View
+import android.view.View.GONE
 import android.view.ViewGroup
+import android.widget.LinearLayout
 import com.android.enmycity.R
 import com.android.enmycity.data.UserSharedPreferences
-import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.android.synthetic.main.fragment_messages.chat_chats_recyclerView
+import kotlinx.android.synthetic.main.fragment_messages.chat_progressBar
 
 class ChatsFragment : Fragment(), ChatsView {
+
   private val presenter: ChatsPresenter by lazy {
-    ChatsPresenter(FirebaseFirestore.getInstance(), FirebaseDatabase.getInstance(),
+    ChatsPresenter(FirebaseFirestore.getInstance(),
         UserSharedPreferences(context!!))
   }
+  private val chatsAdapter = ChatsAdapter(mutableListOf())
 
   override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? =
       inflater.inflate(R.layout.fragment_messages, container, false)
@@ -23,10 +29,26 @@ class ChatsFragment : Fragment(), ChatsView {
     super.onViewCreated(view, savedInstanceState)
     presenter.setView(this)
     presenter.onViewReady()
+    initRecyclerView()
   }
 
-  override fun showChats(chats: List<ChatDto>) {
-    TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+  private fun initRecyclerView() {
+    chat_chats_recyclerView.apply {
+      setHasFixedSize(true)
+      layoutManager = LinearLayoutManager(context, LinearLayout.VERTICAL, false)
+      adapter = chatsAdapter
+    }
+  }
+
+  override fun showChat(chat: Chat) {
+    chatsAdapter.let {
+      it.addChat(chat)
+      it.notifyDataSetChanged()
+    }
+  }
+
+  override fun hiddeProgressBar() {
+    chat_progressBar.visibility = GONE
   }
 
 //  val dataBaseReference = FirebaseDatabase.getInstance().reference

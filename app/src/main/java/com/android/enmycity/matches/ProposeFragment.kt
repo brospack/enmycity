@@ -39,9 +39,11 @@ class ProposeFragment : Fragment(), ProposeView {
     }
   }
 
-  override fun showPropose(propose: ProposeViewModel): Unit = proposesAdapter.let {
-    it.addPropose(propose)
-    it.notifyDataSetChanged()
+  override fun showPropose(propose: ProposeViewModel) {
+    proposesAdapter.let {
+      it.addPropose(propose)
+      it.notifyDataSetChanged()
+    }
   }
 
   override fun showEmptyData() {

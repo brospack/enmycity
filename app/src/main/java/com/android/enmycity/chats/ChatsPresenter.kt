@@ -6,7 +6,7 @@ import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.firestore.FirebaseFirestore
 
 class ChatsPresenter(
-    private val firebaseFirestore: FirebaseFirestore, private val firebaseDatabase: FirebaseDatabase,
+    private val firebaseFirestore: FirebaseFirestore,
     private val userSharedPreferences: UserSharedPreferences
 ) {
   private lateinit var view: ChatsView
@@ -16,20 +16,47 @@ class ChatsPresenter(
   }
 
   fun onViewReady() {
+    getChatsAsOwner()
+    getChatsAsGuest()
+  }
+
+  private fun getChatsAsOwner() {
     firebaseFirestore.collection(FirestoreCollectionNames.CHATS)
-        .whereEqualTo("uid", userSharedPreferences.getUserLogged().uid)
+        .whereEqualTo("ownerId", userSharedPreferences.getUserLogged().id)
+        .whereEqualTo("status", 2)
         .get()
         .addOnSuccessListener {
           if (!it.isEmpty) {
-            it.forEach {
-            }
+            it.documents
+                .map {
+                  val chatDto = it.toObject(ChatDto::class.java) ?: ChatDto()
+                  Chat(it.id, chatDto.guestName, chatDto.guestPhoto)
+                }
+                .forEach {
+                  view.showChat(it)
+                }
           }
         }
   }
 
-  private fun getLocalChats() {
-  }
-
-  private fun getTravellerChats() {
+  private fun getChatsAsGuest() {
+    firebaseFirestore.collection(FirestoreCollectionNames.CHATS)
+        .whereEqualTo("guestId", userSharedPreferences.getUserLogged().id)
+        .whereEqualTo("status", 2)
+        .get()
+        .addOnSuccessListener {
+          if (!it.isEmpty) {
+            it.documents
+                .map {
+                  val chatDto = it.toObject(ChatDto::class.java) ?: ChatDto()
+                  Chat(it.id, chatDto.ownerName, chatDto.ownerPhoto)
+                }
+                .forEach {
+                  view.showChat(it)
+                }
+          }
+        }
+        .addOnFailureListener { }
+        .addOnCompleteListener { view.hiddeProgressBar() }
   }
 }

@@ -1,9 +1,9 @@
 package com.android.enmycity.settings
 
-import com.android.enmycity.data.UserLogged
+import com.android.enmycity.data.User
 
 interface SettingsView {
-  fun showUserData(userLogged: UserLogged)
+  fun showUserData(user: User)
   fun showLogoutMessage()
   fun goToLoginActivity()
 }

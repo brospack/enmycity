@@ -4,7 +4,7 @@ import com.android.enmycity.user.model.GenderType
 import com.android.enmycity.user.model.UserType
 import com.google.firebase.firestore.GeoPoint
 
-data class UserLogged(
+data class User(
     val uid: String = "",
     val id: String = "",
     val name: String = "",

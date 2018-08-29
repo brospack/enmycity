@@ -9,8 +9,7 @@ import android.view.View.VISIBLE
 import android.view.ViewGroup
 import android.widget.Switch
 import com.android.enmycity.R
-import com.android.enmycity.data.UserDao
-import com.android.enmycity.data.UserLogged
+import com.android.enmycity.data.User
 import com.android.enmycity.data.UserSharedPreferences
 import com.bumptech.glide.Glide
 import kotlinx.android.synthetic.main.fragment_user_profile.user_ProgressBar
@@ -43,7 +42,7 @@ class UserFragment : Fragment(), UserView {
    */
   private val presenter: UserPresenter by lazy { UserPresenter(UserSharedPreferences(context!!)) }
   private lateinit var lastInterests: String
-  private lateinit var user: UserLogged
+  private lateinit var user: User
 
   override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
     return inflater.inflate(R.layout.fragment_user_profile, container, false)
@@ -67,11 +66,11 @@ class UserFragment : Fragment(), UserView {
     }
   }
 
-  override fun showUserData(userLogged: UserLogged) {
-    user = userLogged
-    with(userLogged) {
+  override fun showUserData(user: User) {
+    this.user = user
+    with(user) {
       showImage(photoUrl)
-      user_name_textView.text = userLogged.name
+      user_name_textView.text = user.name
       user_coffeeLanguage_switch.isChecked = coffeeLanguage
       user_nightLife_switch.isChecked = nightLife
       user_localShopping_switch.isChecked = localShopping

@@ -3,7 +3,6 @@ package com.android.enmycity.matches
 import com.android.enmycity.chats.ChatDto
 import com.android.enmycity.common.FirestoreCollectionNames
 import com.android.enmycity.data.UserSharedPreferences
-import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 
 class ProposePresenter(private val userSharedPreferences: UserSharedPreferences, private val firestore: FirebaseFirestore) {
@@ -14,24 +13,43 @@ class ProposePresenter(private val userSharedPreferences: UserSharedPreferences,
   }
 
   fun onViewReady() {
-    getPendingProposals()
-    getUserProposals()
+    userSharedPreferences.getUserLogged().let {
+      getPendingProposals(it.id)
+      getUserProposals(it.id)
+    }
   }
 
-  private fun getUserProposals() {
-  }
-
-  private fun getPendingProposals() {
-    val userUid = FirebaseAuth.getInstance().uid
+  private fun getUserProposals(userId: String) {
     firestore.collection(FirestoreCollectionNames.CHATS)
-        .whereEqualTo("ownerId", userUid)
+        .whereEqualTo("guestId", userId)
+        .whereEqualTo("status", 1)
         .get()
         .addOnSuccessListener {
           if (!it.isEmpty) {
-            it.documents.map { it.toObject(ChatDto::class.java) ?: ChatDto() }
-                .filter { it.status == 1 }
-                .filter { it.ownerId == userUid }
-                .map { ProposeViewModel(it.ownerId, it.status, it.guestName, it.guestPhoto, isProponent = true) }
+            it.documents
+                .map {
+                  val chatDto = it.toObject(ChatDto::class.java) ?: ChatDto()
+                  ProposeViewModel(it.id, chatDto.guestId, chatDto.guestName, chatDto.guestPhoto, isOwner = false)
+                }
+                .forEach {
+                  view.showPropose(it)
+                }
+          }
+        }
+  }
+
+  private fun getPendingProposals(userId: String) {
+    firestore.collection(FirestoreCollectionNames.CHATS)
+        .whereEqualTo("ownerId", userId)
+        .whereEqualTo("status", 1)
+        .get()
+        .addOnSuccessListener {
+          if (!it.isEmpty) {
+            it.documents
+                .map {
+                  val chatDto = it.toObject(ChatDto::class.java) ?: ChatDto()
+                  ProposeViewModel(it.id, chatDto.guestId, chatDto.guestName, chatDto.guestPhoto, isOwner = true)
+                }
                 .forEach {
                   view.showPropose(it)
                 }

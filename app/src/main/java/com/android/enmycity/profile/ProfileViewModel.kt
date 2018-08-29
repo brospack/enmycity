@@ -13,7 +13,7 @@ class ProfileViewModel(val name: String,
                        val volunteering: Boolean,
                        val photoUrl: String,
                        val email: String,
-                       val uid: String) : Parcelable {
+                       val id: String) : Parcelable {
   constructor(parcel: Parcel) : this(
       parcel.readString(),
       parcel.readByte() != 0.toByte(),
@@ -38,7 +38,7 @@ class ProfileViewModel(val name: String,
     parcel.writeByte(if (volunteering) 1 else 0)
     parcel.writeString(photoUrl)
     parcel.writeString(email)
-    parcel.writeString(uid)
+    parcel.writeString(id)
   }
 
   override fun describeContents() = 0

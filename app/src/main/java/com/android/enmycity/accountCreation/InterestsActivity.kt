@@ -7,9 +7,9 @@ import android.util.Log
 import android.widget.Switch
 import com.android.enmycity.R
 import com.android.enmycity.common.FirestoreCollectionNames
-import com.android.enmycity.data.MapUserLoggedFromUserDao
+import com.android.enmycity.data.MapUserDaoToUser
 import com.android.enmycity.data.UserDao
-import com.android.enmycity.data.UserLogged
+import com.android.enmycity.data.User
 import com.android.enmycity.data.UserSharedPreferences
 import com.android.enmycity.openUserMainActivity
 import com.android.enmycity.services.SaveTokenUseCase
@@ -85,14 +85,14 @@ class InterestsActivity : AppCompatActivity() {
           .collection(collectionName)
           .add(userDao)
           .addOnSuccessListener {
-            val userLogged = MapUserLoggedFromUserDao().map(userDao, collectionName, it.id)
+            val userLogged = MapUserDaoToUser().map(userDao, collectionName, it.id)
             saveUserInPreferences(userLogged)
           }
           .addOnFailureListener { Log.i("Fail saving", it.message) }
     }
   }
 
-  private fun saveUserInPreferences(userLogged: UserLogged) {
+  private fun saveUserInPreferences(user: User) {
     val fieldName = when (accountCreationPreferences.getUserType() == FirestoreCollectionNames.LOCALS) {
       true -> "localId"
       false -> "travellerId"
@@ -100,9 +100,9 @@ class InterestsActivity : AppCompatActivity() {
     FirebaseFirestore.getInstance()
         .collection(FirestoreCollectionNames.USERS)
         .document(accountCreationPreferences.getUserId())
-        .update(fieldName, userLogged.id)
+        .update(fieldName, user.id)
         .addOnSuccessListener {
-          userPreferences.saveUserLogged(userLogged)
+          userPreferences.saveUserLogged(user)
           saveTokenUseCase.saveToken()
           accountCreationPreferences.clear()
           openUserMainActivity()

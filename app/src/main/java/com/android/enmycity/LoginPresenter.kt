@@ -2,7 +2,7 @@ package com.android.enmycity
 
 import com.android.enmycity.accountCreation.selectTypeUser.UserAccountDao
 import com.android.enmycity.common.FirestoreCollectionNames
-import com.android.enmycity.data.MapUserLoggedFromUserDao
+import com.android.enmycity.data.MapUserDaoToUser
 import com.android.enmycity.data.UserDao
 import com.android.enmycity.data.UserSharedPreferences
 import com.android.enmycity.user.AccountCreationPreferences
@@ -91,7 +91,7 @@ class LoginPresenter(
         .addOnSuccessListener {
           if (it.exists()) {
             val userDao = it.toObject(UserDao::class.java) ?: UserDao()
-            val userLogged = MapUserLoggedFromUserDao().map(userDao, collectionName, it.id)
+            val userLogged = MapUserDaoToUser().map(userDao, collectionName, it.id)
             userSharedPreferences.saveUserLogged(userLogged)
             view.goToMainActivity()
           } else view.goToSelectUserTypeActivity()

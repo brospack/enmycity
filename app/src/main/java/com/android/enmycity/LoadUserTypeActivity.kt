@@ -3,12 +3,9 @@ package com.android.enmycity
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import com.android.enmycity.common.FirestoreCollectionNames
-import com.android.enmycity.data.MapUserLoggedFromUserDao
+import com.android.enmycity.data.MapUserDaoToUser
 import com.android.enmycity.data.UserDao
-import com.android.enmycity.data.UserLogged
 import com.android.enmycity.data.UserSharedPreferences
-import com.android.enmycity.user.model.GenderType
-import com.android.enmycity.user.model.UserType
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.android.synthetic.main.activity_load_user_type.loadUserType_local
@@ -47,7 +44,7 @@ class LoadUserTypeActivity : AppCompatActivity() {
           if (it.documents.isNotEmpty()) {
             val document = it.documents.first()
             val userDao: UserDao = document.toObject(UserDao::class.java) ?: UserDao()
-            val userLogged = MapUserLoggedFromUserDao().map(userDao, collection, document.id)
+            val userLogged = MapUserDaoToUser().map(userDao, collection, document.id)
             userSharedPreferences.saveUserLogged(userLogged)
             openSearchActivity()
           }

@@ -1,5 +1,6 @@
 package com.android.enmycity.chats
 
 interface ChatsView {
-  fun showChats(chats: List<ChatDto>)
+  fun showChat(chat: Chat)
+  fun hiddeProgressBar()
 }

@@ -16,6 +16,7 @@ import android.view.ViewGroup
 import com.android.enmycity.R
 import com.android.enmycity.accountCreation.selectTypeUser.UserAccountDao
 import com.android.enmycity.common.FirestoreCollectionNames
+import com.android.enmycity.data.User
 import com.android.enmycity.data.UserDao
 import com.android.enmycity.data.UserSharedPreferences
 import com.google.android.gms.common.ConnectionResult
@@ -99,7 +100,7 @@ class SearchFragment : Fragment(), SearchView, GoogleApiClient.OnConnectionFaile
     activity?.longToast(message)
   }
 
-  override fun addProfiles(profiles: List<UserDao>) {
+  override fun addProfiles(profiles: List<User>) {
     recyclerView = rootView.findViewById(R.id.search_results_recyclerView)
     recyclerView.apply {
       setHasFixedSize(true)

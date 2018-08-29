@@ -1,5 +1,8 @@
 package com.android.enmycity.search
 
+import com.android.enmycity.common.FirestoreCollectionNames
+import com.android.enmycity.data.MapUserDaoToUser
+import com.android.enmycity.data.User
 import com.android.enmycity.data.UserDao
 import com.android.enmycity.data.UserSharedPreferences
 import com.android.enmycity.user.model.UserType
@@ -23,9 +26,9 @@ class SearchPresenter(
   }
 
   private lateinit var view: SearchView
-  private var usersMap = mutableMapOf<String, UserDao>()
-  private var coffeeLanguage = false;
-  private var localShopping = false;
+  private val users = mutableSetOf<User>()
+  private var coffeeLanguage = false
+  private var localShopping = false
 
   fun setView(view: SearchView) {
     this.view = view
@@ -52,7 +55,7 @@ class SearchPresenter(
         .get()
         .addOnCompleteListener {
           if (it.isSuccessful) {
-            showElementsInView(it.result.documents)
+            showElementsInView(it.result.documents, FirestoreCollectionNames.TRAVELLERS)
             coffeeLanguage = true
             getLocation()
           } else
@@ -73,14 +76,14 @@ class SearchPresenter(
   }
 
   private fun searchLocalProfiles() {
-    val search = firestore.collection("locals")
+    val search = firestore.collection(FirestoreCollectionNames.LOCALS)
     getInterestForFilter().forEach {
       search.whereEqualTo(it, true)
     }
     search.get()
         .addOnCompleteListener {
           if (it.isSuccessful) {
-            showElementsInView(it.result.documents)
+            showElementsInView(it.result.documents, FirestoreCollectionNames.LOCALS)
           }
         }
     userSharedPreferences.getUserLogged().let {
@@ -90,12 +93,12 @@ class SearchPresenter(
   }
 
   private fun searchTravellerProfiles() {
-    val travellersSearch = firestore.collection("travellers")
+    val travellersSearch = firestore.collection(FirestoreCollectionNames.TRAVELLERS)
     travellersSearch.whereEqualTo("gastronomicTour", true)
         .get()
         .addOnCompleteListener {
           if (it.isSuccessful) {
-            showElementsInView(it.result.documents)
+            showElementsInView(it.result.documents, FirestoreCollectionNames.TRAVELLERS)
             coffeeLanguage = true
             getLocation()
           }
@@ -105,24 +108,18 @@ class SearchPresenter(
         .get()
         .addOnCompleteListener {
           if (it.isSuccessful) {
-            showElementsInView(it.result.documents)
+            showElementsInView(it.result.documents, FirestoreCollectionNames.TRAVELLERS)
             localShopping = true
             getLocation()
           }
         }
   }
 
-  private fun showElementsInView(documents: List<DocumentSnapshot>) {
-    val users = mutableListOf<UserDao>()
+  private fun showElementsInView(documents: List<DocumentSnapshot>, collectionName: String) {
     documents.forEach {
-      users.add(it.toObject(UserDao::class.java)!!)
-      addUserInList(it.toObject(UserDao::class.java)!!)
-    }
-  }
-
-  private fun addUserInList(userDao: UserDao) {
-    if (!usersMap.containsKey(userDao.email)) {
-      usersMap[userDao.email] = userDao
+      val userDao = it.toObject(UserDao::class.java)!!
+      val user = MapUserDaoToUser().map(userDao, collectionName, it.id)
+      users.add(user)
     }
   }
 
@@ -143,11 +140,11 @@ class SearchPresenter(
     val latitude = userSharedPreferences.getUserLogged().location.latitude
     val longitude = userSharedPreferences.getUserLogged().location.longitude
     view.showLocation(latitude, longitude)
-    view.addProfiles(usersMap.values.toList())
+    view.addProfiles(users.toList())
     view.hideProgressBar()
 
     if (localShopping && coffeeLanguage) {
-      view.addProfiles(usersMap.values.toList())
+      view.addProfiles(users.toList())
       view.hideProgressBar()
     }
   }

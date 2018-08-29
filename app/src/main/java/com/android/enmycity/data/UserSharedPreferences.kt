@@ -21,19 +21,19 @@ class UserSharedPreferences(
     editor = sharedPreferences.edit()
   }
 
-  fun saveUserLogged(userLogged: UserLogged) {
+  fun saveUserLogged(user: User) {
     with(editor) {
-      putString(USER_LOGGED, gson.toJson(userLogged))
+      putString(USER_LOGGED, gson.toJson(user))
       apply()
     }
   }
 
-  fun getUserLogged(): UserLogged {
-    var userLogged = UserLogged()
+  fun getUserLogged(): User {
+    var userLogged = User()
     val userLoggedGsoned = sharedPreferences.getString(USER_LOGGED, null)
 
     gson.let {
-      val type = object : TypeToken<UserLogged>() {}.type
+      val type = object : TypeToken<User>() {}.type
       userLogged = it.fromJson(userLoggedGsoned, type)
     }
     return userLogged

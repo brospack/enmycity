@@ -8,13 +8,14 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import com.android.enmycity.R
+import com.android.enmycity.data.User
 import com.android.enmycity.data.UserDao
 import com.android.enmycity.profile.ProfileActivity
 import com.android.enmycity.profile.ProfileViewModel
 import com.bumptech.glide.Glide
 import io.reactivex.subjects.PublishSubject
 
-class ProfilesAdapter(private val elements: List<UserDao>, private val context: Context) :
+class ProfilesAdapter(private val elements: List<User>, private val context: Context) :
     RecyclerView.Adapter<ProfilesAdapter.ProfilesView>() {
 
   val itemClickStream: PublishSubject<View> = PublishSubject.create()
@@ -33,12 +34,12 @@ class ProfilesAdapter(private val elements: List<UserDao>, private val context: 
     private val nameTextView by lazy { view.findViewById<TextView>(R.id.viewUserProfile_name) }
     private val avatarImageView by lazy { view.findViewById<ImageView>(R.id.viewUserProfile_avatar_imageView) }
 
-    fun bind(userDao: UserDao) {
-      nameTextView.text = userDao.name
-      Glide.with(context).load(userDao.photoUrl).into(avatarImageView)
-      val profileViewModel = with(userDao) {
+    fun bind(user: User) {
+      nameTextView.text = user.name
+      Glide.with(context).load(user.photoUrl).into(avatarImageView)
+      val profileViewModel = with(user) {
         ProfileViewModel(name, coffeeLanguage, nightLife, localShopping, gastronomicTour, cityTour, sportBreak, volunteering, photoUrl,
-            email, uid)
+            email, id)
       }
       itemView.setOnClickListener { ProfileActivity.open(profileViewModel, context) }
     }

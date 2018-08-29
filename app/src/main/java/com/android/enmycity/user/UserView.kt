@@ -1,9 +1,9 @@
 package com.android.enmycity.user
 
-import com.android.enmycity.data.UserLogged
+import com.android.enmycity.data.User
 
 interface UserView {
-  fun showUserData(userLogged: UserLogged)
+  fun showUserData(user: User)
 
   fun showSuccessfulUpdateMessage()
 

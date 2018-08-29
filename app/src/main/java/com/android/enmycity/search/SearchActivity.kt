@@ -12,6 +12,7 @@ import android.view.MenuItem
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import com.android.enmycity.R
+import com.android.enmycity.data.User
 import com.android.enmycity.data.UserDao
 import com.android.enmycity.data.UserSharedPreferences
 import com.android.enmycity.main.UserMainActivity
@@ -112,7 +113,7 @@ class SearchActivity : AppCompatActivity(), SearchView, BottomNavigationView.OnN
     search_progressBar.visibility = GONE
   }
 
-  override fun addProfiles(profiles: List<UserDao>) {
+  override fun addProfiles(profiles: List<User>) {
     search_results_recyclerView.apply {
       setHasFixedSize(true)
       layoutManager = GridLayoutManager(this@SearchActivity, 2)
