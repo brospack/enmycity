@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
+import android.view.MenuItem
 import com.android.enmycity.R
 import com.android.enmycity.data.UserDao
 import com.android.enmycity.data.UserSharedPreferences
@@ -35,6 +36,7 @@ class ProfileActivity : AppCompatActivity(), ProfileView {
     super.onCreate(savedInstanceState)
     setContentView(R.layout.activity_profile)
     presenter.setView(this)
+
     profileViewModel = intent.getParcelableExtra(USER_KEY)
     with(profileViewModel) {
       showImage(photoUrl)
@@ -42,6 +44,11 @@ class ProfileActivity : AppCompatActivity(), ProfileView {
     }
     profile_contact_floatingActionButton.setOnClickListener {
       presenter.onProposeCreated(profileViewModel)
+    }
+
+    supportActionBar?.let {
+      it.setDisplayHomeAsUpEnabled(true)
+      it.setDisplayShowHomeEnabled(true)
     }
   }
 
@@ -63,5 +70,12 @@ class ProfileActivity : AppCompatActivity(), ProfileView {
 
   override fun proposeDidntSended() {
     toast("KO")
+  }
+
+  override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+    if (item?.itemId == android.R.id.home) {
+      finish()
+    }
+    return super.onOptionsItemSelected(item)
   }
 }

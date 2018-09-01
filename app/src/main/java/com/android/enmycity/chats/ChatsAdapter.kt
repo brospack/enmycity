@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import com.android.enmycity.R
+import com.android.enmycity.conversation.ConversationActivity
 import com.bumptech.glide.Glide
 
 class ChatsAdapter(private val chats: MutableList<Chat>) : RecyclerView.Adapter<ChatsAdapter.ChatViewHolder>() {
@@ -33,10 +34,7 @@ class ChatsAdapter(private val chats: MutableList<Chat>) : RecyclerView.Adapter<
     fun bind(chat: Chat) {
       name.text = chat.name
       Glide.with(context).load(chat.photo).into(photo)
-      itemView.setOnClickListener { }
-    }
-
-    private fun openConversation() {
+      itemView.setOnClickListener { ConversationActivity.open(context, chat.id) }
     }
   }
 }

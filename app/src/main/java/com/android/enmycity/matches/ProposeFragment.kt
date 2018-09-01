@@ -18,7 +18,7 @@ import org.jetbrains.anko.toast
 
 class ProposeFragment : Fragment(), ProposeView {
   private val presenter: ProposePresenter by lazy { ProposePresenter(UserSharedPreferences(context!!), FirebaseFirestore.getInstance()) }
-  private lateinit var proposesAdapter: ProposesAdapter
+  private val proposesAdapter = ProposesAdapter(mutableListOf())
 
   override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? =
       inflater.inflate(R.layout.fragment_propose, container, false)
@@ -31,7 +31,6 @@ class ProposeFragment : Fragment(), ProposeView {
   }
 
   private fun initRecyclerView() {
-    proposesAdapter = ProposesAdapter(mutableListOf(), context!!)
     propose_proposes_recyclerView.apply {
       setHasFixedSize(true)
       layoutManager = LinearLayoutManager(context, VERTICAL, false)

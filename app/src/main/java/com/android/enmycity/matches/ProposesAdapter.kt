@@ -10,18 +10,19 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import com.android.enmycity.R
+import com.android.enmycity.common.FirestoreCollectionNames
 import com.android.enmycity.common.StatusId
 import com.bumptech.glide.Glide
+import com.google.firebase.firestore.FirebaseFirestore
 import org.jetbrains.anko.toast
 
 class ProposesAdapter(
-    private val proposes: MutableList<ProposeViewModel>,
-    private val context: Context
+    private val proposes: MutableList<ProposeViewModel>
 ) : RecyclerView.Adapter<ProposesAdapter.ProposeViewHolder>() {
 
   override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ProposeViewHolder {
     val view = LayoutInflater.from(parent.context).inflate(R.layout.view_holder_propose, parent, false)
-    return ProposeViewHolder(view)
+    return ProposeViewHolder(view, parent.context)
   }
 
   override fun getItemCount(): Int = proposes.size
@@ -34,7 +35,7 @@ class ProposesAdapter(
     proposes.add(proposeViewModel)
   }
 
-  inner class ProposeViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+  inner class ProposeViewHolder(view: View, private val context: Context) : RecyclerView.ViewHolder(view) {
     private val avatar by lazy { view.findViewById<ImageView>(R.id.viewPropose_avatar_imageView) }
     private val name by lazy { view.findViewById<TextView>(R.id.viewPropose_name_textView) }
     private val status by lazy { view.findViewById<TextView>(R.id.viewPropose_status_textView) }
@@ -54,6 +55,15 @@ class ProposesAdapter(
           setOnClickListener { context.toast("ACEPTADO") }
         }
       }
+    }
+
+    private fun createConversation(proposeViewModel: ProposeViewModel) {
+      FirebaseFirestore.getInstance()
+          .collection(FirestoreCollectionNames.CHATS)
+          .document(proposeViewModel.chatId)
+          .update("status", 2)
+          .addOnSuccessListener {  }
+          .addOnFailureListener {  }
     }
   }
 }
