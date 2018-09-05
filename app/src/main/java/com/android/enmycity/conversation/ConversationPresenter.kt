@@ -23,11 +23,8 @@ class ConversationPresenter(private val userSharedPreferences: UserSharedPrefere
 //    createConversation(chatId)
     dbReference = FirebaseDatabase.getInstance().reference.child("conversations").child(chatId).ref
 
-
-
     conversationValueEventListener = object : ValueEventListener {
       override fun onCancelled(databaseError: DatabaseError) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
       }
 
       override fun onDataChange(dataSnapshot: DataSnapshot) {

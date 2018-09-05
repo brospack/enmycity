@@ -29,6 +29,8 @@ class SearchPresenter(
   private val users = mutableSetOf<User>()
   private var coffeeLanguage = false
   private var localShopping = false
+  private lateinit var lastDocument: DocumentSnapshot
+  private var isPaginationActive = false
 
   fun setView(view: SearchView) {
     this.view = view
@@ -94,32 +96,32 @@ class SearchPresenter(
 
   private fun searchTravellerProfiles() {
     val travellersSearch = firestore.collection(FirestoreCollectionNames.TRAVELLERS)
-    travellersSearch.whereEqualTo("gastronomicTour", true)
-        .get()
-        .addOnCompleteListener {
-          if (it.isSuccessful) {
-            showElementsInView(it.result.documents, FirestoreCollectionNames.TRAVELLERS)
-            coffeeLanguage = true
-            getLocation()
-          }
-        }
 
-    travellersSearch.whereEqualTo("localShopping", true)
-        .get()
-        .addOnCompleteListener {
-          if (it.isSuccessful) {
-            showElementsInView(it.result.documents, FirestoreCollectionNames.TRAVELLERS)
-            localShopping = true
-            getLocation()
-          }
+    if (!isPaginationActive) {
+      travellersSearch.whereEqualTo("localShopping", true).limit(6).get().addOnSuccessListener {
+        if (!it.isEmpty) {
+          showElementsInView(it.documents, FirestoreCollectionNames.TRAVELLERS)
+          lastDocument = it.documents[it.size() - 1]
+          localShopping = true
+          isPaginationActive = true
         }
+      }
+    } else {
+      travellersSearch.whereEqualTo("localShopping", true).startAfter(lastDocument).limit(6).get().addOnSuccessListener {
+        if (!it.isEmpty) {
+          showElementsInView(it.documents, FirestoreCollectionNames.TRAVELLERS)
+          lastDocument = it.documents[it.size() - 1]
+          localShopping = true
+        }
+      }
+    }
   }
 
   private fun showElementsInView(documents: List<DocumentSnapshot>, collectionName: String) {
     documents.forEach {
       val userDao = it.toObject(UserDao::class.java)!!
       val user = MapUserDaoToUser().map(userDao, collectionName, it.id)
-      users.add(user)
+      view.addProfile(user)
     }
   }
 
@@ -139,12 +141,12 @@ class SearchPresenter(
   private fun getLocation() {
     val latitude = userSharedPreferences.getUserLogged().location.latitude
     val longitude = userSharedPreferences.getUserLogged().location.longitude
-    view.showLocation(latitude, longitude)
-    view.addProfiles(users.toList())
+//    view.showLocation(latitude, longitude)
+//    view.addProfiles(users.toList())
     view.hideProgressBar()
 
     if (localShopping && coffeeLanguage) {
-      view.addProfiles(users.toList())
+//      view.addProfiles(users.toList())
       view.hideProgressBar()
     }
   }

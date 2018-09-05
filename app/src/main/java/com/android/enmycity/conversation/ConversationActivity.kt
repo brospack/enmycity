@@ -71,10 +71,6 @@ class ConversationActivity : AppCompatActivity(), ConversationView {
     return super.onOptionsItemSelected(item)
   }
 
-  override fun showAllMessages(messages: List<Message>) {
-    conversationAdapter.addMessages(messages)
-  }
-
   override fun showMessage(message: Message) {
     conversationAdapter.addMessage(message)
     conversationAdapter.notifyDataSetChanged()

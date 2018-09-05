@@ -113,11 +113,11 @@ class SearchActivity : AppCompatActivity(), SearchView, BottomNavigationView.OnN
     search_progressBar.visibility = GONE
   }
 
-  override fun addProfiles(profiles: List<User>) {
+  override fun addProfile(profiles: User) {
     search_results_recyclerView.apply {
       setHasFixedSize(true)
       layoutManager = GridLayoutManager(this@SearchActivity, 2)
-      adapter = ProfilesAdapter(profiles, context)
+//      adapter = ProfilesAdapter(profiles, context)
     }
   }
 }

@@ -47,10 +47,10 @@ class SearchFragment : Fragment(), SearchView, GoogleApiClient.OnConnectionFaile
     const val RESULT_CODE_PLACE_AUTOCOMPLETE = 10
   }
 
-  private var count = 0
   private lateinit var rootView: View
-  private lateinit var recyclerView: RecyclerView
+  private val profilesAdapter: ProfilesAdapter = ProfilesAdapter(mutableListOf())
   private val presenter: SearchPresenter by lazy { SearchPresenter(UserSharedPreferences(context!!), FirebaseFirestore.getInstance()) }
+  private val gridLayoutManager: GridLayoutManager by lazy { GridLayoutManager(context, 2) }
   override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
     rootView = inflater.inflate(R.layout.fragment_search, container, false)
     return rootView
@@ -58,6 +58,7 @@ class SearchFragment : Fragment(), SearchView, GoogleApiClient.OnConnectionFaile
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
+    initRecyclerView()
     presenter.setView(this)
     presenter.onViewReady()
     search_places_floatingActionButton.setOnClickListener { startPlaceAutocomplete() }
@@ -65,9 +66,26 @@ class SearchFragment : Fragment(), SearchView, GoogleApiClient.OnConnectionFaile
 //    createUsers()
   }
 
+  private fun initRecyclerView() {
+    search_results_recyclerView.apply {
+      setHasFixedSize(true)
+      layoutManager = gridLayoutManager
+      adapter = profilesAdapter
+      addOnScrollListener(object : RecyclerView.OnScrollListener() {
+        override fun onScrolled(recyclerView: RecyclerView?, dx: Int, dy: Int) {
+          super.onScrolled(recyclerView, dx, dy)
+          if (gridLayoutManager.findLastCompletelyVisibleItemPosition() >= gridLayoutManager.itemCount - 1) {
+            presenter.onViewReady()
+          }
+        }
+      })
+    }
+  }
+
   private fun startPlaceAutocomplete() {
     showProgressBar()
     try {
+      search_places_floatingActionButton.visibility = GONE
       val autocompleteFilters = AutocompleteFilter
           .Builder()
           .setTypeFilter(
@@ -79,7 +97,6 @@ class SearchFragment : Fragment(), SearchView, GoogleApiClient.OnConnectionFaile
 
       startActivityForResult(intent, RESULT_CODE_PLACE_AUTOCOMPLETE)
       hideProgressBar()
-      search_places_floatingActionButton.visibility = GONE
     } catch (e: GooglePlayServicesRepairableException) {
     } catch (e: GooglePlayServicesNotAvailableException) {
     }
@@ -100,46 +117,35 @@ class SearchFragment : Fragment(), SearchView, GoogleApiClient.OnConnectionFaile
     activity?.longToast(message)
   }
 
-  override fun addProfiles(profiles: List<User>) {
-    recyclerView = rootView.findViewById(R.id.search_results_recyclerView)
-    recyclerView.apply {
-      setHasFixedSize(true)
-      layoutManager = GridLayoutManager(context, 2)
-      adapter = ProfilesAdapter(profiles, context)
-      hideProgressBar()
-    }
-//    search_results_recyclerView.apply {
-//      setHasFixedSize(true)
-//      layoutManager = GridLayoutManager(context, 2)
-//      adapter = ProfilesAdapter(profiles, context)
-//      hideProgressBar()
-////      activity?.toast(profiles.size.toString())
-//    }
+  override fun addProfile(user: User) {
+    profilesAdapter.addUser(user)
+    profilesAdapter.notifyDataSetChanged()
+    hideProgressBar()
   }
 
   override fun showLocation(latitude: Double, longitude: Double) {
-//    val query = "city"
-//    val location = LatLng(latitude, longitude)
-//    val latLng = LatLngBounds.Builder().include(location).include(location).build()
-//
-//    val filter = AutocompleteFilter.Builder()
-//        .setTypeFilter(AutocompleteFilter.TYPE_FILTER_CITIES)
-//        .build()
-//
-//    val googleApiClient = GoogleApiClient.Builder(context!!)
-//        .addApi(Places.GEO_DATA_API)
-//        .addApi(Places.PLACE_DETECTION_API)
-//        .enableAutoManage(activity!!, this)
-//        .build()
-//
-//    val results = Places.GeoDataApi.getAutocompletePredictions(googleApiClient, query, latLng, filter)
-//    var resultData = ""
-//    results.setResultCallback {
-//      it.forEach {
-//        resultData = it?.placeId ?: ""
-//      }
-//      activity?.longToast(resultData)
-//    }
+    val query = "city"
+    val location = LatLng(latitude, longitude)
+    val latLng = LatLngBounds.Builder().include(location).include(location).build()
+
+    val filter = AutocompleteFilter.Builder()
+        .setTypeFilter(AutocompleteFilter.TYPE_FILTER_CITIES)
+        .build()
+
+    val googleApiClient = GoogleApiClient.Builder(context!!)
+        .addApi(Places.GEO_DATA_API)
+        .addApi(Places.PLACE_DETECTION_API)
+        .enableAutoManage(activity!!, this)
+        .build()
+
+    val results = Places.GeoDataApi.getAutocompletePredictions(googleApiClient, query, latLng, filter)
+    var resultData = ""
+    results.setResultCallback {
+      it.forEach {
+        resultData = it?.placeId ?: ""
+      }
+      activity?.longToast(resultData)
+    }
   }
 
   override fun showProgressBar() {

@@ -15,7 +15,7 @@ import com.android.enmycity.profile.ProfileViewModel
 import com.bumptech.glide.Glide
 import io.reactivex.subjects.PublishSubject
 
-class ProfilesAdapter(private val elements: List<User>, private val context: Context) :
+class ProfilesAdapter(private val elements: MutableList<User>) :
     RecyclerView.Adapter<ProfilesAdapter.ProfilesView>() {
 
   val itemClickStream: PublishSubject<View> = PublishSubject.create()
@@ -23,14 +23,18 @@ class ProfilesAdapter(private val elements: List<User>, private val context: Con
 
   override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ProfilesView {
     val view = LayoutInflater.from(parent.context).inflate(R.layout.view_user_profile, parent, false)
-    return ProfilesView(view)
+    return ProfilesView(view, parent.context)
   }
 
   override fun onBindViewHolder(holder: ProfilesView, position: Int) {
     holder.bind(elements.get(position))
   }
 
-  inner class ProfilesView(view: View) : RecyclerView.ViewHolder(view) {
+  fun addUser(user: User) {
+    elements.add(user)
+  }
+
+  inner class ProfilesView(view: View, private val context: Context) : RecyclerView.ViewHolder(view) {
     private val nameTextView by lazy { view.findViewById<TextView>(R.id.viewUserProfile_name) }
     private val avatarImageView by lazy { view.findViewById<ImageView>(R.id.viewUserProfile_avatar_imageView) }
 

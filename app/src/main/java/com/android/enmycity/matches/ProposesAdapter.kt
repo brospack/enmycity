@@ -13,6 +13,7 @@ import com.android.enmycity.R
 import com.android.enmycity.common.FirestoreCollectionNames
 import com.android.enmycity.common.StatusId
 import com.bumptech.glide.Glide
+import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.firestore.FirebaseFirestore
 import org.jetbrains.anko.toast
 
@@ -52,18 +53,27 @@ class ProposesAdapter(
       } else {
         acceptPropose.apply {
           visibility = VISIBLE
-          setOnClickListener { context.toast("ACEPTADO") }
+          setOnClickListener { createConversation(proposeViewModel.chatId) }
         }
       }
     }
 
-    private fun createConversation(proposeViewModel: ProposeViewModel) {
+    private fun createConversation(chatId: String) {
       FirebaseFirestore.getInstance()
           .collection(FirestoreCollectionNames.CHATS)
-          .document(proposeViewModel.chatId)
+          .document(chatId)
           .update("status", 2)
-          .addOnSuccessListener {  }
-          .addOnFailureListener {  }
+          .addOnSuccessListener { addConversationToRealtimedb(chatId) }
+          .addOnFailureListener { context.toast("Ha ocurrido un error") }
+    }
+
+    private fun addConversationToRealtimedb(chatId: String) {
+      FirebaseDatabase.getInstance()
+          .reference
+          .child("conversations")
+          .setValue(chatId)
+          .addOnSuccessListener { }
+          .addOnFailureListener { context.toast("Ha ocurrido un error") }
     }
   }
 }
