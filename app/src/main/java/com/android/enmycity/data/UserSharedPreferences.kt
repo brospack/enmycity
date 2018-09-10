@@ -12,6 +12,7 @@ class UserSharedPreferences(
 ) {
   companion object {
     private const val USER_LOGGED = "USER_LOGGED_PREFERENCES"
+    private const val PLACE_ID = "USER_PREFERENCES_PLACE_ID"
   }
 
   private val sharedPreferences: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
@@ -28,14 +29,27 @@ class UserSharedPreferences(
     }
   }
 
+  fun saveLastSearch(placeId: String) {
+    with(editor) {
+      putString(PLACE_ID, placeId)
+      apply()
+    }
+  }
+
+  fun getLastSearch() = sharedPreferences.getString(PLACE_ID, "")
+
   fun getUserLogged(): User {
     var userLogged = User()
     val userLoggedGsoned = sharedPreferences.getString(USER_LOGGED, null)
 
-    gson.let {
+    if (userLoggedGsoned != null) {
       val type = object : TypeToken<User>() {}.type
-      userLogged = it.fromJson(userLoggedGsoned, type)
+      userLogged = gson.fromJson(userLoggedGsoned, type)
     }
+//    gson.let {
+//      val type = object : TypeToken<User>() {}.type
+//      userLogged = it.fromJson(userLoggedGsoned, type)
+//    }
     return userLogged
   }
 

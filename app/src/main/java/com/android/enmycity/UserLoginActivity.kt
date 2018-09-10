@@ -67,12 +67,12 @@ class UserLoginActivity : AppCompatActivity(), LoginView {
 
   private fun showsLocationsDialog() {
     alert(R.string.userLogin_allow_location_message) {
-      positiveButton(R.string.accept, { openSettings() })
-      negativeButton(R.string.cancel, {
+      positiveButton(R.string.accept) { openSettings() }
+      negativeButton(R.string.cancel) {
         showSnack(R.string.userlogin_open_settings_message,
-            R.string.userlogin_open_settings_button,
-            { openSettings() })
-      })
+            R.string.userlogin_open_settings_button)
+        { openSettings() }
+      }
     }.show()
   }
 

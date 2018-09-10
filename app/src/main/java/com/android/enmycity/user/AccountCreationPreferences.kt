@@ -10,8 +10,7 @@ import com.android.enmycity.longBitsToDouble
 class AccountCreationPreferences(context: Context) {
   companion object {
     private const val USER_ID = "ACCOUNT_CREATION_PREFERENCES_USER_ID"
-    private const val USER_LOCAL_ID = "ACCOUNT_CREATION_PREFERENCES_USER_LOCAL_ID"
-    private const val USER_TRAVELLER_ID = "ACCOUNT_CREATION_PREFERENCES_USER_TRAVELLER_ID"
+    private const val USER_PLACE_ID = "ACCOUNT_CREATION_PREFERENCES_PLACE_ID"
     private const val USER_NAME = "ACCOUNT_CREATION_PREFERENCES_NAME"
     private const val USER_EMAIL = "ACCOUNT_CREATION_PREFERENCES_EMAIL"
     private const val USER_AVATAR = "ACCOUNT_CREATION_PREFERENCES_AVATAR"
@@ -33,14 +32,6 @@ class AccountCreationPreferences(context: Context) {
 
   fun saveUserName(name: String) = saveStringValue(USER_NAME, name)
 
-  fun saveUserLocalId(id: String) = saveStringValue(USER_LOCAL_ID, id)
-
-  fun getUserLocalId() = sharedPreferences.getString(USER_LOCAL_ID, "")
-
-  fun saveUserTravellerId(id: String) = saveStringValue(USER_TRAVELLER_ID, id)
-
-  fun getUserTravellerId() = sharedPreferences.getString(USER_TRAVELLER_ID, "")
-
   fun getUserName(): String = sharedPreferences.getString(USER_NAME, "")
 
   fun saveUserEmail(email: String) = saveStringValue(USER_EMAIL, email)
@@ -58,6 +49,10 @@ class AccountCreationPreferences(context: Context) {
   fun saveLongitude(longitude: Double) = saveDoubleValue(USER_LONGITUDE, longitude)
 
   fun getLongitude() = sharedPreferences.getLong(USER_LONGITUDE, 0L).longBitsToDouble()
+
+  fun savePlaceId(placeId: String) = saveStringValue(USER_PLACE_ID, placeId)
+
+  fun getPlaceId() = sharedPreferences.getString(USER_PLACE_ID, "")
 
   fun setIsUserLocal(isLocal: Boolean) = with(editor) {
     putBoolean(USER_IS_LOCAL, isLocal)

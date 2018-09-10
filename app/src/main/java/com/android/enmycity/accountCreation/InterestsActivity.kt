@@ -78,7 +78,8 @@ class InterestsActivity : AppCompatActivity() {
           postalCode = addresses.first()?.postalCode.orEmpty(),
           location = GeoPoint(getLatitude(), getLongitude()),
           adminArea = addresses.first()?.adminArea.orEmpty(),
-          subAdminArea = addresses.first()?.subAdminArea.orEmpty())
+          subAdminArea = addresses.first()?.subAdminArea.orEmpty(),
+          placeId = getPlaceId())
       val collectionName = getUserType()
 
       FirebaseFirestore.getInstance()

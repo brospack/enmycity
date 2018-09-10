@@ -37,10 +37,20 @@ class SearchPresenter(
   }
 
   fun onViewReady() {
+    view.showProgressBar()
+    if (userSharedPreferences.getLastSearch().isNotEmpty()) {
+
+    }
     when (userSharedPreferences.getUserLogged().userType) {
       UserType.TRAVELLER -> searchLocalProfiles()
       UserType.LOCAL -> searchTravellerProfiles()
     }
+  }
+
+  private fun getLastSearch() {
+  }
+
+  private fun doFirstSearch() {
   }
 
   fun search(bounds: LatLngBounds) {
@@ -117,12 +127,21 @@ class SearchPresenter(
     }
   }
 
+  private fun searchProfiles(collectionName: String, placeId: String) {
+    firestore.collection(collectionName)
+        .whereEqualTo("placeId", placeId)
+        .limit(4)
+
+    userSharedPreferences.saveLastSearch(placeId)
+  }
+
   private fun showElementsInView(documents: List<DocumentSnapshot>, collectionName: String) {
     documents.forEach {
       val userDao = it.toObject(UserDao::class.java)!!
       val user = MapUserDaoToUser().map(userDao, collectionName, it.id)
       view.addProfile(user)
     }
+    view.hideProgressBar()
   }
 
   private fun getInterestForFilter() =

@@ -30,5 +30,6 @@ data class UserDao(
     val adminArea: String = "",
     val subAdminArea: String = "",
     val latitude: Double = 0.0,
-    val longitude: Double = 0.0
+    val longitude: Double = 0.0,
+    val placeId:String = ""
 )
