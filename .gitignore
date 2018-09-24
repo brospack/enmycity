@@ -48,7 +48,7 @@ captures/
 .idea/modules.xml
 .idea/scopes/scope_settings.xml
 .idea/vcs.xml
-*.iml
+.idea/checkstyle-idea.xml
 
 # Keystore files
 *.jks
