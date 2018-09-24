@@ -5,7 +5,6 @@ import android.app.Activity
 import com.android.enmycity.accountCreation.InterestsActivity
 import com.android.enmycity.main.InitActivity
 import com.android.enmycity.main.UserMainActivity
-import com.android.enmycity.search.SearchActivity
 import com.android.enmycity.accountCreation.selectTypeUser.SelectTypeUserActivity
 import org.jetbrains.anko.startActivity
 
@@ -26,11 +25,6 @@ fun Activity.openSelectUserTypeActivity() {
 
 fun Activity.openInterestsActivity() {
   startActivity<InterestsActivity>()
-  this.finish()
-}
-
-fun Activity.openSearchActivity() {
-  startActivity<SearchActivity>()
   this.finish()
 }
 

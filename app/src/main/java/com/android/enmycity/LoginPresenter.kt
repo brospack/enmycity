@@ -34,10 +34,15 @@ class LoginPresenter(
     }
   }
 
-  fun loginGoogleUser(googleSignInAccount: GoogleSignInAccount) = signInUser(
-      GoogleAuthProvider.getCredential(googleSignInAccount.idToken, null))
+  fun loginGoogleUser(googleSignInAccount: GoogleSignInAccount) {
+    view.showProgressBar()
+    signInUser(GoogleAuthProvider.getCredential(googleSignInAccount.idToken, null))
+  }
 
-  fun loginFacebookUser(accessToken: AccessToken) = signInUser(FacebookAuthProvider.getCredential(accessToken.token))
+  fun loginFacebookUser(accessToken: AccessToken) {
+    view.showProgressBar()
+    signInUser(FacebookAuthProvider.getCredential(accessToken.token))
+  }
 
   private fun signInUser(credential: AuthCredential) {
     firebaseAuth

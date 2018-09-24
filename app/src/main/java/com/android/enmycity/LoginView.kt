@@ -6,4 +6,5 @@ interface LoginView {
   fun goToMainActivity()
   fun goToSelectUserTypeActivity()
   fun goToLoadUserTypeActivity()
+  fun showProgressBar()
 }

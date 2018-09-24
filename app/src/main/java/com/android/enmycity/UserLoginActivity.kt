@@ -109,7 +109,6 @@ class UserLoginActivity : AppCompatActivity(), LoginView {
 
     val facebookCallback = object : FacebookCallback<LoginResult> {
       override fun onSuccess(loginResult: LoginResult) {
-        login_progress_bar.visibility = VISIBLE
         login_facebook_button.visibility = GONE
         presenter.loginFacebookUser(AccessToken.getCurrentAccessToken())
       }
@@ -150,6 +149,10 @@ class UserLoginActivity : AppCompatActivity(), LoginView {
 //      executeAsync()
 //    }
 //  }
+
+  override fun showProgressBar() {
+    login_progress_bar.visibility = VISIBLE
+  }
 
   override fun showLoginError(message: String) {
     toast(message)

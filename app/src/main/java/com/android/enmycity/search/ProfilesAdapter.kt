@@ -34,6 +34,10 @@ class ProfilesAdapter(private val elements: MutableList<User>) :
     elements.add(user)
   }
 
+  fun clear(){
+    elements.clear()
+  }
+
   inner class ProfilesView(view: View, private val context: Context) : RecyclerView.ViewHolder(view) {
     private val nameTextView by lazy { view.findViewById<TextView>(R.id.viewUserProfile_name) }
     private val avatarImageView by lazy { view.findViewById<ImageView>(R.id.viewUserProfile_avatar_imageView) }

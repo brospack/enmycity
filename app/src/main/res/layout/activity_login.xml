@@ -2,18 +2,10 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                xmlns:tools="http://schemas.android.com/tools"
                 android:layout_marginLeft="48dp"
                 android:layout_marginRight="48dp"
     >
-  <ProgressBar
-      style="?android:attr/progressBarStyle"
-      android:layout_width="match_parent"
-      android:layout_height="match_parent"
-      android:id="@+id/login_progress_bar"
-      android:visibility="gone"
-      android:layout_centerHorizontal="true"
-      android:layout_centerVertical="true"
-      />
 
   <com.facebook.login.widget.LoginButton
       xmlns:facebook="http://schemas.android.com/apk/res-auto"
@@ -36,5 +28,17 @@
       android:paddingBottom="24dp"
       android:paddingTop="24dp"
       android:visibility="gone"
+      />
+
+  <ProgressBar
+      style="?android:attr/progressBarStyle"
+      android:layout_width="match_parent"
+      android:layout_height="match_parent"
+      android:id="@+id/login_progress_bar"
+      android:visibility="gone"
+      tools:visibility="visible"
+      android:background="#FFFFFF"
+      android:layout_centerHorizontal="true"
+      android:layout_centerVertical="true"
       />
 </RelativeLayout>

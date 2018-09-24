@@ -3,6 +3,7 @@ package com.android.enmycity.data
 import android.content.Context
 import android.content.SharedPreferences
 import android.preference.PreferenceManager
+import com.android.enmycity.search.Search
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 
@@ -12,7 +13,7 @@ class UserSharedPreferences(
 ) {
   companion object {
     private const val USER_LOGGED = "USER_LOGGED_PREFERENCES"
-    private const val PLACE_ID = "USER_PREFERENCES_PLACE_ID"
+    private const val LAST_SEARCH = "USER_PREFERENCES_LAST_SEARCH"
   }
 
   private val sharedPreferences: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
@@ -29,15 +30,6 @@ class UserSharedPreferences(
     }
   }
 
-  fun saveLastSearch(placeId: String) {
-    with(editor) {
-      putString(PLACE_ID, placeId)
-      apply()
-    }
-  }
-
-  fun getLastSearch() = sharedPreferences.getString(PLACE_ID, "")
-
   fun getUserLogged(): User {
     var userLogged = User()
     val userLoggedGsoned = sharedPreferences.getString(USER_LOGGED, null)
@@ -46,14 +38,29 @@ class UserSharedPreferences(
       val type = object : TypeToken<User>() {}.type
       userLogged = gson.fromJson(userLoggedGsoned, type)
     }
-//    gson.let {
-//      val type = object : TypeToken<User>() {}.type
-//      userLogged = it.fromJson(userLoggedGsoned, type)
-//    }
     return userLogged
   }
 
   fun isUserLogged() = getUserLogged().id.isNotEmpty()
+
+  fun saveLastSearch(search: Search) {
+    with(editor) {
+      putString(LAST_SEARCH, gson.toJson(search))
+      apply()
+    }
+  }
+
+  fun getLastSearch(): Search {
+    var search = Search()
+    val searchGsoned = sharedPreferences.getString(LAST_SEARCH, null)
+
+    if (searchGsoned != null) {
+      val type = object : TypeToken<Search>() {}.type
+      search = gson.fromJson(searchGsoned, type)
+    }
+
+    return search
+  }
 
   fun clear() = editor.clear()
 }

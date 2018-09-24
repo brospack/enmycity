@@ -8,7 +8,6 @@ import android.view.MenuItem
 import com.android.enmycity.R
 import com.android.enmycity.data.UserDao
 import com.android.enmycity.data.UserSharedPreferences
-import com.android.enmycity.openSearchActivity
 import com.android.enmycity.openUserMainActivity
 import com.bumptech.glide.Glide
 import com.google.firebase.firestore.FirebaseFirestore

@@ -1,50 +1,33 @@
 package com.android.enmycity.search
 
-import android.annotation.SuppressLint
-import android.app.Activity.RESULT_OK
-import android.content.Intent
-import android.location.Geocoder
+import android.app.Fragment
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
-import android.view.View.GONE
-import android.view.View.VISIBLE
 import android.view.ViewGroup
 import com.android.enmycity.R
-import com.android.enmycity.accountCreation.selectTypeUser.UserAccountDao
-import com.android.enmycity.common.FirestoreCollectionNames
 import com.android.enmycity.data.User
-import com.android.enmycity.data.UserDao
 import com.android.enmycity.data.UserSharedPreferences
-import com.google.android.gms.common.ConnectionResult
-import com.google.android.gms.common.GooglePlayServicesNotAvailableException
-import com.google.android.gms.common.GooglePlayServicesRepairableException
-import com.google.android.gms.common.api.GoogleApiClient
+import com.google.android.gms.common.api.Status
 import com.google.android.gms.location.places.AutocompleteFilter
-import com.google.android.gms.location.places.PlaceFilter
-import com.google.android.gms.location.places.Places
-import com.google.android.gms.location.places.ui.PlaceAutocomplete
-import com.google.android.gms.location.places.ui.PlacePicker
-import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.LatLngBounds
+import com.google.android.gms.location.places.Place
+import com.google.android.gms.location.places.ui.PlaceAutocompleteFragment
+import com.google.android.gms.location.places.ui.PlaceSelectionListener
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.GeoPoint
 import kotlinx.android.synthetic.main.activity_search.search_results_recyclerView
-import kotlinx.android.synthetic.main.fragment_search.search_places_floatingActionButton
-import kotlinx.android.synthetic.main.fragment_search.search_progressBar
 import org.jetbrains.anko.longToast
 import org.jetbrains.anko.toast
 
-class SearchFragment : Fragment(), SearchView, GoogleApiClient.OnConnectionFailedListener {
-  override fun onConnectionFailed(p0: ConnectionResult) {
-    TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+class SearchFragment : Fragment(), SearchView {
+  override fun showPlaceAutocompleteEmpty() {
+    showPlaceAutocompleteFragment("Busca algo payasooooo")
   }
 
-  companion object {
-    const val RESULT_CODE_PLACE_AUTOCOMPLETE = 10
+  override fun showPlaceAutocompleteWithText(location: String) {
+    showPlaceAutocompleteFragment(location)
   }
 
   private lateinit var rootView: View
@@ -59,11 +42,9 @@ class SearchFragment : Fragment(), SearchView, GoogleApiClient.OnConnectionFaile
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
     initRecyclerView()
+//    showPlaceAutocompleteFragment()
     presenter.setView(this)
     presenter.onViewReady()
-    search_places_floatingActionButton.setOnClickListener { startPlaceAutocomplete() }
-    getLocation()
-//    createUsers()
   }
 
   private fun initRecyclerView() {
@@ -75,41 +56,32 @@ class SearchFragment : Fragment(), SearchView, GoogleApiClient.OnConnectionFaile
         override fun onScrolled(recyclerView: RecyclerView?, dx: Int, dy: Int) {
           super.onScrolled(recyclerView, dx, dy)
           if (gridLayoutManager.findLastCompletelyVisibleItemPosition() >= gridLayoutManager.itemCount - 1) {
-            presenter.onViewReady()
+            presenter.onNewPagination()
           }
         }
       })
     }
   }
 
-  private fun startPlaceAutocomplete() {
-    showProgressBar()
-    try {
-      search_places_floatingActionButton.visibility = GONE
-      val autocompleteFilters = AutocompleteFilter
-          .Builder()
-          .setTypeFilter(
-              AutocompleteFilter.TYPE_FILTER_CITIES)
-          .build()
-      val intent = PlaceAutocomplete.IntentBuilder(PlaceAutocomplete.MODE_OVERLAY)
-          .setFilter(autocompleteFilters)
-          .build(activity)
+  private fun showPlaceAutocompleteFragment(location: String) {
+    val placeAutocompleteFragment =
+        activity?.fragmentManager?.findFragmentById(R.id.search_autocomplete_fragment) as PlaceAutocompleteFragment
+    placeAutocompleteFragment.apply {
+      setFilter(AutocompleteFilter.Builder().setTypeFilter(AutocompleteFilter.TYPE_FILTER_CITIES).build())
+      setHint(location)
+      setOnPlaceSelectedListener(object : PlaceSelectionListener {
+        override fun onPlaceSelected(place: Place?) {
+          val hola = ""
+          place?.let {
+            presenter.onPlaceSelected(it.id, it.name.toString())
+          }
+        }
 
-      startActivityForResult(intent, RESULT_CODE_PLACE_AUTOCOMPLETE)
-      hideProgressBar()
-    } catch (e: GooglePlayServicesRepairableException) {
-    } catch (e: GooglePlayServicesNotAvailableException) {
-    }
-  }
+        override fun onError(p0: Status?) {
+          toast("error")
+        }
+      })
 
-  override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-    (requestCode == RESULT_CODE_PLACE_AUTOCOMPLETE && resultCode == RESULT_OK).let {
-      val place = PlaceAutocomplete.getPlace(context, data)
-//      showLocation(place.latLng.latitude, place.latLng.longitude)
-      val placeData = place.viewport?.northeast.toString() + place.viewport?.southwest.toString()
-      presenter.search(LatLngBounds(place.viewport?.southwest, place.viewport?.northeast))
-      search_places_floatingActionButton.visibility = VISIBLE
-//      activity?.longToast(placeData)
     }
   }
 
@@ -123,106 +95,21 @@ class SearchFragment : Fragment(), SearchView, GoogleApiClient.OnConnectionFaile
     hideProgressBar()
   }
 
-  override fun showLocation(latitude: Double, longitude: Double) {
-    val query = "city"
-    val location = LatLng(latitude, longitude)
-    val latLng = LatLngBounds.Builder().include(location).include(location).build()
-
-    val filter = AutocompleteFilter.Builder()
-        .setTypeFilter(AutocompleteFilter.TYPE_FILTER_CITIES)
-        .build()
-
-    val googleApiClient = GoogleApiClient.Builder(context!!)
-        .addApi(Places.GEO_DATA_API)
-        .addApi(Places.PLACE_DETECTION_API)
-        .enableAutoManage(activity!!, this)
-        .build()
-
-    val results = Places.GeoDataApi.getAutocompletePredictions(googleApiClient, query, latLng, filter)
-    var resultData = ""
-    results.setResultCallback {
-      it.forEach {
-        resultData = it?.placeId ?: ""
-      }
-      activity?.longToast(resultData)
-    }
+  override fun clearProfiles() {
+    profilesAdapter.clear()
+    profilesAdapter.notifyDataSetChanged()
   }
 
   override fun showProgressBar() {
-    search_progressBar.visibility = VISIBLE
+//    search_progressBar.visibility = VISIBLE
   }
 
   override fun hideProgressBar() {
-    search_progressBar.visibility = GONE
+//    search_progressBar.visibility = GONE
   }
 
-  @SuppressLint("MissingPermission")
-  private fun getLocation() {
-//    context?.let {
-//      val googleApiClient = GoogleApiClient.Builder(it)
-//          .addApi(Places.GEO_DATA_API)
-//          .addApi(Places.PLACE_DETECTION_API)
-//          .enableAutoManage(activity!!, this)
-//          .build()
-//
-//      val result = Places.PlaceDetectionApi.getCurrentPlace(googleApiClient, null)
-//      var resultPlaces = ""
-//      result.setResultCallback {
-//        it.forEach {
-//          resultPlaces = "${it.place.id}-${it.place.name};  "
-//
-//        }
-//        activity?.longToast(resultPlaces)
-//      }
-//    }
-  }
+  override fun onDestroy() {
 
-  private fun createUsers() {
-    val db = FirebaseFirestore.getInstance()
-    var batchTravellers = db.batch()
-    var batchUsers = db.batch()
-
-    for (i in 1..8) {
-      val email = "testTraveller0$i@mail.com"
-      val name = "traveller_$i"
-      val photo = "https://i.dawn.com/large/2016/11/582caa9db7dfa.jpg"
-      val uid = "xUiD-$i"
-      val travelerId = "Tr-id-$i"
-
-      val user = UserDao(
-          uid = uid,
-          name = name,
-          email = email,
-          photoUrl = photo,
-          gender = 1,
-          birthday = "17/07/1954",
-          city = "Hamburgo",
-          statusId = 1,
-          location = GeoPoint(53.33, 10.00),
-          coffeeLanguage = true,
-          nightLife = true,
-          localShopping = true,
-          gastronomicTour = false,
-          cityTour = false,
-          sportBreak = false,
-          volunteering = false)
-      val documentReference = db.collection(FirestoreCollectionNames.TRAVELLERS).document(travelerId)
-      batchTravellers.set(documentReference, user)
-
-      val userAccound = UserAccountDao(
-          uid = uid,
-          name = name,
-          email = email,
-          photo = photo,
-          type = 1,
-          travellerId = travelerId
-      )
-
-      val userDocumentReference = db.collection(FirestoreCollectionNames.USERS).document(uid)
-      batchUsers.set(userDocumentReference, userAccound)
-    }
-    batchTravellers.commit().addOnCompleteListener {
-      batchUsers.commit()
-    }
+    super.onDestroy()
   }
 }

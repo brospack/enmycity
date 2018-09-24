@@ -2,7 +2,6 @@ package com.android.enmycity.settings
 
 import com.android.enmycity.data.UserSharedPreferences
 import com.facebook.login.LoginManager
-import com.google.android.gms.auth.api.Auth
 import com.google.firebase.auth.FirebaseAuth
 
 class SettingsPresenter(

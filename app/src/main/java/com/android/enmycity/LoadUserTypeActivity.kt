@@ -46,7 +46,6 @@ class LoadUserTypeActivity : AppCompatActivity() {
             val userDao: UserDao = document.toObject(UserDao::class.java) ?: UserDao()
             val userLogged = MapUserDaoToUser().map(userDao, collection, document.id)
             userSharedPreferences.saveUserLogged(userLogged)
-            openSearchActivity()
           }
         }
   }

@@ -80,7 +80,6 @@
     <activity android:name=".UserLoginActivity"/>
     <activity android:name=".accountCreation.InterestsActivity"/>
     <activity android:name=".accountCreation.selectTypeUser.SelectTypeUserActivity"/>
-    <activity android:name=".search.SearchActivity"/>
     <activity android:name=".main.UserMainActivity"/>
     <activity android:name=".profile.ProfileActivity"/>
     <activity android:name=".conversation.ConversationActivity"/>
