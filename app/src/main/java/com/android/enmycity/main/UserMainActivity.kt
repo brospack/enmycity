@@ -16,25 +16,7 @@ import com.android.enmycity.user.UserFragment
 import kotlinx.android.synthetic.main.activity_user_main.search_results_bottomNavigationView
 
 class UserMainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemSelectedListener {
-  override fun onNavigationItemSelected(item: MenuItem): Boolean {
-    return when (item.itemId) {
-      R.id.bottomNavigationMenu_search -> replaceFragment(SearchFragment())
-      R.id.bottomNavigationMenu_user -> replaceFragment(UserFragment())
-      R.id.bottomNavigationMenu_matches -> replaceFragment(ProposeFragment())
-      R.id.bottomNavigationMenu_messages -> replaceFragment(ChatsFragment())
-      R.id.bottomNavigationMenu_settings -> replaceFragment(SettingsFragment())
-      else -> true
-    }
-  }
-
-  private fun replaceFragment(fragment: Fragment): Boolean {
-    supportFragmentManager.beginTransaction().apply {
-      replace(R.id.myFragment, fragment)
-      commit()
-    }
-    return true
-  }
-
+  private var currentFragment: Fragment? = null
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     setContentView(R.layout.activity_user_main)
@@ -65,5 +47,35 @@ class UserMainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationI
 //        longToast("Place: $placeName - $latitude; $longitude")
 //      }
 //    }
+  }
+
+  override fun onNavigationItemSelected(item: MenuItem): Boolean {
+    return when (item.itemId) {
+      R.id.bottomNavigationMenu_search -> replaceFragment(SearchFragment())
+      R.id.bottomNavigationMenu_user -> replaceFragment(UserFragment())
+      R.id.bottomNavigationMenu_matches -> replaceFragment(ProposeFragment())
+      R.id.bottomNavigationMenu_messages -> replaceFragment(ChatsFragment())
+      R.id.bottomNavigationMenu_settings -> replaceFragment(SettingsFragment())
+      else -> true
+    }
+  }
+
+  private fun replaceFragment(fragment: Fragment): Boolean {
+    deleteCurrentFragment()
+    currentFragment = fragment
+    supportFragmentManager.beginTransaction().apply {
+      replace(R.id.myFragment, fragment)
+      commit()
+    }
+    return true
+  }
+
+  private fun deleteCurrentFragment() {
+    if (currentFragment != null) {
+      supportFragmentManager.beginTransaction().apply {
+        remove(currentFragment)
+        commitAllowingStateLoss()
+      }
+    }
   }
 }
