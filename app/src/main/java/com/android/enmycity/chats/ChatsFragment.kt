@@ -13,14 +13,17 @@ import com.android.enmycity.data.UserSharedPreferences
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.android.synthetic.main.fragment_messages.chat_chats_recyclerView
 import kotlinx.android.synthetic.main.fragment_messages.chat_progressBar
+import org.jetbrains.anko.alert
+import org.jetbrains.anko.noButton
+import org.jetbrains.anko.toast
+import org.jetbrains.anko.yesButton
 
 class ChatsFragment : Fragment(), ChatsView {
-
   private val presenter: ChatsPresenter by lazy {
     ChatsPresenter(FirebaseFirestore.getInstance(),
         UserSharedPreferences(context!!))
   }
-  private val chatsAdapter = ChatsAdapter(mutableListOf())
+  private var chatsAdapter = ChatsAdapter(mutableListOf())
 
   override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? =
       inflater.inflate(R.layout.fragment_messages, container, false)
@@ -41,14 +44,22 @@ class ChatsFragment : Fragment(), ChatsView {
   }
 
   override fun showChat(chat: Chat) {
-    chatsAdapter.let {
-      it.addChat(chat)
-      it.notifyDataSetChanged()
-    }
+    chatsAdapter.addChat(chat)
   }
 
-  override fun hiddeProgressBar() {
+  override fun hideProgressBar() {
     chat_progressBar.visibility = GONE
+  }
+
+  override fun showDeletedMessage() {
+    activity?.toast("polla")
+  }
+
+  override fun showDeleteDialogConfirmation() {
+    activity?.alert("Seguro que quieres?", "eliminar chat") {
+      yesButton { presenter.onChatDeleted() }
+      noButton { }
+    }?.show()
   }
 
 //  val dataBaseReference = FirebaseDatabase.getInstance().reference

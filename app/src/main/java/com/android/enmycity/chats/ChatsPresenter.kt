@@ -2,7 +2,6 @@ package com.android.enmycity.chats
 
 import com.android.enmycity.common.FirestoreCollectionNames
 import com.android.enmycity.data.UserSharedPreferences
-import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.firestore.FirebaseFirestore
 
 class ChatsPresenter(
@@ -18,6 +17,15 @@ class ChatsPresenter(
   fun onViewReady() {
     getChatsAsOwner()
     getChatsAsGuest()
+  }
+
+  fun onDeleteButton() {
+    view.showDeleteDialogConfirmation()
+  }
+
+  fun onChatDeleted() {
+    firebaseFirestore.collection(FirestoreCollectionNames.CHATS)
+    view.showDeletedMessage()
   }
 
   private fun getChatsAsOwner() {
@@ -57,6 +65,6 @@ class ChatsPresenter(
           }
         }
         .addOnFailureListener { }
-        .addOnCompleteListener { view.hiddeProgressBar() }
+        .addOnCompleteListener { view.hideProgressBar() }
   }
 }

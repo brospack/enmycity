@@ -2,5 +2,7 @@ package com.android.enmycity.chats
 
 interface ChatsView {
   fun showChat(chat: Chat)
-  fun hiddeProgressBar()
+  fun hideProgressBar()
+  fun showDeletedMessage()
+  fun showDeleteDialogConfirmation()
 }

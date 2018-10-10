@@ -3,4 +3,7 @@
   <color name="colorPrimary">#ff7a62</color>
   <color name="colorPrimaryDark">#3d7799</color>
   <color name="colorAccent">#52d19a</color>
+  <color name="white">#FFFFFF</color>
+  <color name="messageOwner">#65AFB4</color>
+  <color name="messageGuest">#887D87</color>
 </resources>

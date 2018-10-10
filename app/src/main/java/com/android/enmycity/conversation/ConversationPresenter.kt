@@ -35,7 +35,7 @@ class ConversationPresenter(private val userSharedPreferences: UserSharedPrefere
         view.hideLoading()
       }
     }
-    dbReference.limitToLast(10).addListenerForSingleValueEvent(conversationValueEventListener)
+    dbReference.limitToLast(30).addListenerForSingleValueEvent(conversationValueEventListener)
   }
 
   private fun setChildEventListener() {
@@ -62,7 +62,7 @@ class ConversationPresenter(private val userSharedPreferences: UserSharedPrefere
   fun onMessageSent(text: String) {
     childEventListenerIsEnabled = true
     dbReference.push().key?.let {
-      val message = Message(userSharedPreferences.getUserLogged().id, text)
+      val message = MessageDto(userSharedPreferences.getUserLogged().id, text)
       dbReference.child(it).setValue(message)
       view.deleteTypedMessage()
     }
@@ -73,8 +73,10 @@ class ConversationPresenter(private val userSharedPreferences: UserSharedPrefere
   }
 
   private fun showMessage(dataSnapshot: DataSnapshot) {
-    dataSnapshot.getValue(Message::class.java)?.let {
-      view.showMessage(it)
+    dataSnapshot.getValue(MessageDto::class.java)?.let {
+      val userLoggedId = userSharedPreferences.getUserLogged().id
+      val message = Message(it.userId, it.message, it.userId == userLoggedId)
+      view.showMessage(message)
       view.hideLoading()
     }
   }
@@ -82,8 +84,8 @@ class ConversationPresenter(private val userSharedPreferences: UserSharedPrefere
   private fun createConversation(chatId: String) {
     val alexId = "11111"
     val lauraId = "22222"
-    val message1 = Message(alexId, "Hola Laura")
-    val message2 = Message(lauraId, "Hola Alex, qué tal?")
+    val message1 = MessageDto(alexId, "Hola Laura")
+    val message2 = MessageDto(lauraId, "Hola Alex, qué tal?")
     val conversationDto = ConversationDto(ownerId = alexId,
         ownerName = "Alex",
         ownerPhoto = "photo alex",

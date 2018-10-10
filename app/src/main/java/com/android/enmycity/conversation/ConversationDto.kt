@@ -7,5 +7,5 @@ class ConversationDto(
     val guestId: String = "",
     val guestName: String = "",
     val guestPhoto: String = "",
-    val messages: List<Message> = listOf()
+    val messages: List<MessageDto> = listOf()
 )
